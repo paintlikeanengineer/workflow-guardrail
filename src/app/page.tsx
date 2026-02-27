@@ -90,9 +90,45 @@ export default function Home() {
 
     // If designer is uploading, check scope
     if (currentView === "designer") {
-      // For demo: simulate detected objects (no bench)
-      // In real app, this would call Cortex Vision
-      const detectedObjects = ["building", "awning", "sky", "trees"]
+      // Add trace for vision call
+      addTraces([{
+        agent: "ScopeWatcher",
+        status: "started",
+        message: "Calling Cortex Vision to analyze image...",
+        timestamp: Date.now(),
+      }])
+
+      // Call Cortex Vision API to detect objects
+      // Upload file to Snowflake stage, then analyze
+      let detectedObjects: string[] = []
+      try {
+        const formData = new FormData()
+        formData.append("file", file)
+
+        const visionRes = await fetch("/api/vision", {
+          method: "POST",
+          body: formData,
+        })
+        const visionData = await visionRes.json()
+        detectedObjects = visionData.detectedObjects || []
+
+        addTraces([{
+          agent: "ScopeWatcher",
+          status: "completed",
+          message: `Detected ${detectedObjects.length} objects: ${detectedObjects.slice(0, 5).join(", ")}${detectedObjects.length > 5 ? "..." : ""}`,
+          timestamp: Date.now(),
+        }])
+      } catch (err) {
+        console.error("Vision API failed, using fallback:", err)
+        // Fallback: no bench detected (triggers the catch)
+        detectedObjects = ["building", "awning", "sky", "trees"]
+        addTraces([{
+          agent: "ScopeWatcher",
+          status: "warning",
+          message: "Vision API unavailable, using fallback detection",
+          timestamp: Date.now(),
+        }])
+      }
 
       const scopeRes = await fetch("/api/scope-watcher", {
         method: "POST",
