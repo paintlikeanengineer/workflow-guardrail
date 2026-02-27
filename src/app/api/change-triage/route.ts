@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server"
-import { RequestParserOutput, TraceEvent } from "@/types"
+import { ChangeTriageOutput, TraceEvent } from "@/types"
 
 // Keywords that indicate non-trivial changes
 const NON_TRIVIAL_KEYWORDS = [
@@ -24,7 +24,7 @@ export async function POST(request: NextRequest) {
   const messageLower = message.toLowerCase()
 
   traces.push({
-    agent: "RequestParser",
+    agent: "ChangeTriage",
     status: "started",
     message: "Analyzing message for scope-impacting change requests...",
     timestamp: Date.now(),
@@ -41,7 +41,7 @@ export async function POST(request: NextRequest) {
 
   const isNonTrivial = !!matchedKeyword
 
-  const output: RequestParserOutput = {
+  const output: ChangeTriageOutput = {
     hasTask: isNonTrivial,
     confidence: isNonTrivial ? 0.9 : 0.85,
   }
@@ -54,7 +54,7 @@ export async function POST(request: NextRequest) {
     }
 
     traces.push({
-      agent: "RequestParser",
+      agent: "ChangeTriage",
       status: "warning",
       message: `Detected scope-impacting keyword: "${matchedKeyword}". This suggests a change that affects multiple elements or requires significant rework.`,
       timestamp: Date.now(),
@@ -67,7 +67,7 @@ export async function POST(request: NextRequest) {
     })
   } else {
     traces.push({
-      agent: "RequestParser",
+      agent: "ChangeTriage",
       status: "completed",
       message: "Message appears to be conversational or a minor adjustment. No scope triggers found.",
       timestamp: Date.now(),

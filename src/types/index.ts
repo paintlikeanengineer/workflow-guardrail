@@ -94,14 +94,14 @@ export type ScopeWatcherOutput = {
   confidence: number
 }
 
-// RequestParser: Extracts tasks from client messages
+// ChangeTriage: Extracts tasks from client messages
 export type ParsedTask = {
   taskId: string
   description: string
   complexity: 'trivial' | 'moderate' | 'major'
 }
 
-export type RequestParserOutput = {
+export type ChangeTriageOutput = {
   hasTask: boolean
   task?: ParsedTask
   confidence: number
@@ -148,7 +148,7 @@ export type ValidationCard = {
 // Trace Events (for debug/demo visibility)
 // ===========================================
 
-export type AgentName = 'ScopeScribe' | 'ScopeWatcher' | 'RequestParser' | 'CostCalculator'
+export type AgentName = 'ScopeScribe' | 'ScopeWatcher' | 'ChangeTriage' | 'CostCalculator'
 
 export type TraceEvent = {
   agent: AgentName
