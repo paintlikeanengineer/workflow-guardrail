@@ -1,0 +1,42 @@
+{
+  "prdId": "prd-eye-clinics-001",
+  "goals": [
+    {
+      "goalId": "goal-001",
+      "text": "Stylize the newly constructed Eye Clinics facility",
+      "source": "brief",
+      "approved": true,
+      "approvedAt": "2026-02-15T10:00:00Z"
+    },
+    {
+      "goalId": "goal-002",
+      "text": "Style should be playful and inviting",
+      "source": "brief",
+      "approved": true,
+      "approvedAt": "2026-02-15T10:00:00Z"
+    },
+    {
+      "goalId": "goal-003",
+      "text": "Include empty spaces for online campaign reuse",
+      "source": "brief",
+      "approved": true,
+      "approvedAt": "2026-02-15T10:00:00Z"
+    },
+    {
+      "goalId": "goal-004",
+      "text": "Use composition style C (three-quarter view with awning prominent)",
+      "source": "conversation",
+      "approved": true,
+      "approvedAt": "2026-02-20T14:30:00Z",
+      "conversationRef": "msg-004"
+    },
+    {
+      "goalId": "goal-005",
+      "text": "Include anonymized person sitting on bench",
+      "source": "conversation",
+      "approved": true,
+      "approvedAt": "2026-02-20T14:32:00Z",
+      "conversationRef": "msg-005"
+    }
+  ]
+}

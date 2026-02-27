@@ -1,0 +1,99 @@
+{
+  "threadId": "thread-eye-clinics-001",
+  "prdId": "prd-eye-clinics-001",
+  "participants": {
+    "designer": {
+      "name": "Athena",
+      "avatar": "/avatars/athena.jpg"
+    },
+    "client": {
+      "name": "Marcus",
+      "role": "Marketing Director",
+      "company": "Eye Clinics of San Jose",
+      "avatar": "/avatars/marcus.jpg"
+    }
+  },
+  "messages": [
+    {
+      "messageId": "msg-001",
+      "sender": "client",
+      "type": "doc",
+      "content": "Hi Athena! Here's the brief for our advertising poster project. Excited to work with you!",
+      "attachments": ["/docs/brief.pdf"],
+      "timestamp": "2026-02-15T10:00:00Z"
+    },
+    {
+      "messageId": "msg-002",
+      "sender": "designer",
+      "type": "text",
+      "content": "Thanks Marcus! I love the facility - that awning is going to look great stylized. I'll have roughs for you by end of week.",
+      "timestamp": "2026-02-15T11:30:00Z"
+    },
+    {
+      "messageId": "msg-003",
+      "sender": "designer",
+      "type": "image",
+      "content": "Here are 4 rough compositions. Which direction speaks to you? A, B1, B2, or C?",
+      "attachments": ["/images/roughs.jpg"],
+      "timestamp": "2026-02-19T16:00:00Z",
+      "question": {
+        "questionId": "q-001",
+        "text": "Which composition do you prefer?",
+        "options": ["A", "B1", "B2", "C"],
+        "answer": "C",
+        "answeredAt": "2026-02-20T14:30:00Z"
+      }
+    },
+    {
+      "messageId": "msg-004",
+      "sender": "client",
+      "type": "text",
+      "content": "Love option C! The three-quarter angle really shows off the building.",
+      "timestamp": "2026-02-20T14:30:00Z"
+    },
+    {
+      "messageId": "msg-005",
+      "sender": "designer",
+      "type": "text",
+      "content": "Great choice! One more question - do you like the anonymized person on the bench? Adds a human touch.",
+      "timestamp": "2026-02-20T14:31:00Z",
+      "question": {
+        "questionId": "q-002",
+        "text": "Do you like the anonymized person on the bench?",
+        "options": ["Yes", "No"],
+        "answer": "Yes",
+        "answeredAt": "2026-02-20T14:32:00Z"
+      }
+    },
+    {
+      "messageId": "msg-006",
+      "sender": "client",
+      "type": "text",
+      "content": "Yes! It makes the space feel welcoming. Keep it.",
+      "timestamp": "2026-02-20T14:32:00Z"
+    },
+    {
+      "messageId": "msg-007",
+      "sender": "designer",
+      "type": "text",
+      "content": "Perfect. Moving to detailed illustration now. Will share progress in a few days.",
+      "timestamp": "2026-02-20T14:35:00Z"
+    }
+  ],
+
+  "_demoNotes": {
+    "nextMessage": "Designer uploads v1_no_bench.png - triggers ScopeWatcher catch",
+    "catch1": {
+      "trigger": "Designer uploads image without bench",
+      "agent": "ScopeWatcher",
+      "violation": "goal-005 (Include anonymized person sitting on bench)",
+      "action": "Show validation card asking designer to fix"
+    },
+    "catch2": {
+      "trigger": "Client requests 'deeper blue accent'",
+      "agent": "CostCalculator",
+      "estimate": { "hours": 4, "days": 2, "cost": 200 },
+      "action": "Show validation card warning about scope impact"
+    }
+  }
+}
