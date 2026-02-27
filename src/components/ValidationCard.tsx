@@ -5,66 +5,79 @@ type Props = {
   title: string
   message: string
   onAction: (action: "fix" | "send") => void
+  options?: string[]
 }
 
-export function ValidationCard({ type, title, message, onAction }: Props) {
+export function ValidationCard({ type, title, message, onAction, options }: Props) {
   const isViolation = type === "scope_violation"
+
+  // Different colors and icons based on type
+  const headerBg = isViolation ? "bg-orange-500" : "bg-amber-500"
+  const icon = isViolation ? "⚠️" : "💰"
+  const headerTitle = isViolation ? "Scope Warning" : "Cost Impact"
 
   return (
     <div className="flex justify-center mb-2">
-      <div className={`max-w-[80%] p-4 rounded-xl border-2 ${
-        isViolation
-          ? "bg-red-50 border-red-200"
-          : "bg-yellow-50 border-yellow-200"
-      }`}>
-        <div className="flex items-start gap-3">
-          <div className={`text-2xl ${isViolation ? "text-red-500" : "text-yellow-500"}`}>
-            {isViolation ? "⚠️" : "💰"}
+      <div className="max-w-[85%] rounded-2xl overflow-hidden shadow-lg bg-white">
+        {/* Colored header bar with icon */}
+        <div className={`${headerBg} px-4 py-3 flex items-center gap-3`}>
+          <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center text-2xl">
+            {icon}
           </div>
-          <div className="flex-1">
-            <h3 className={`font-semibold ${
-              isViolation ? "text-red-800" : "text-yellow-800"
-            }`}>
-              {title}
-            </h3>
-            <p className={`text-sm mt-1 ${
-              isViolation ? "text-red-700" : "text-yellow-700"
-            }`}>
-              {message}
-            </p>
-            <div className="flex gap-2 mt-3">
-              {isViolation ? (
-                <>
-                  <button
-                    onClick={() => onAction("fix")}
-                    className="px-4 py-1.5 bg-red-500 text-white text-sm font-medium rounded-full hover:bg-red-600 transition-colors"
-                  >
-                    Fix It
-                  </button>
-                  <button
-                    onClick={() => onAction("send")}
-                    className="px-4 py-1.5 bg-white text-red-600 text-sm font-medium rounded-full border border-red-200 hover:bg-red-50 transition-colors"
-                  >
-                    Send Anyway
-                  </button>
-                </>
-              ) : (
-                <>
-                  <button
-                    onClick={() => onAction("fix")}
-                    className="px-4 py-1.5 bg-white text-yellow-700 text-sm font-medium rounded-full border border-yellow-200 hover:bg-yellow-50 transition-colors"
-                  >
-                    Don't Send
-                  </button>
-                  <button
-                    onClick={() => onAction("send")}
-                    className="px-4 py-1.5 bg-yellow-500 text-white text-sm font-medium rounded-full hover:bg-yellow-600 transition-colors"
-                  >
-                    Send Anyway
-                  </button>
-                </>
-              )}
-            </div>
+          <span className="text-white font-semibold text-lg">{headerTitle}</span>
+        </div>
+
+        {/* Content area */}
+        <div className="p-5">
+          <p className="text-gray-800 text-lg mb-4">{message}</p>
+
+          {/* Option buttons */}
+          <div className="flex flex-wrap gap-2">
+            {options ? (
+              options.map((opt) => (
+                <button
+                  key={opt}
+                  onClick={() => onAction("send")}
+                  className="px-5 py-2 bg-gray-100 text-gray-600 text-sm font-medium rounded-full hover:bg-gray-200 transition-colors"
+                >
+                  {opt}
+                </button>
+              ))
+            ) : (
+              <>
+                {isViolation ? (
+                  <>
+                    <button
+                      onClick={() => onAction("fix")}
+                      className="px-5 py-2 bg-orange-500 text-white text-sm font-medium rounded-full hover:bg-orange-600 transition-colors"
+                    >
+                      Fix It
+                    </button>
+                    <button
+                      onClick={() => onAction("send")}
+                      className="px-5 py-2 bg-gray-100 text-gray-600 text-sm font-medium rounded-full hover:bg-gray-200 transition-colors"
+                    >
+                      Send Anyway
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <button
+                      onClick={() => onAction("fix")}
+                      className="px-5 py-2 bg-gray-100 text-gray-600 text-sm font-medium rounded-full hover:bg-gray-200 transition-colors"
+                    >
+                      Don't Send
+                    </button>
+                    <button
+                      onClick={() => onAction("send")}
+                      className="px-5 py-2 bg-amber-500 text-white text-sm font-medium rounded-full hover:bg-amber-600 transition-colors"
+                    >
+                      Send Anyway
+                    </button>
+                  </>
+                )}
+              </>
+            )}
           </div>
         </div>
       </div>
