@@ -26,9 +26,12 @@ export async function POST(request: NextRequest) {
   traces.push({
     agent: "RequestParser",
     status: "started",
-    message: "Analyzing client message for change requests",
+    message: "Analyzing message for scope-impacting change requests...",
     timestamp: Date.now(),
-    data: { messageLength: message.length },
+    data: {
+      input: message.slice(0, 100) + (message.length > 100 ? "..." : ""),
+      scanning: NON_TRIVIAL_KEYWORDS.slice(0, 5).join(", ") + "..."
+    },
   })
 
   // RULE: Check for non-trivial keywords
@@ -53,16 +56,25 @@ export async function POST(request: NextRequest) {
     traces.push({
       agent: "RequestParser",
       status: "warning",
-      message: `Non-trivial change detected (keyword: "${matchedKeyword}")`,
+      message: `Detected scope-impacting keyword: "${matchedKeyword}". This suggests a change that affects multiple elements or requires significant rework.`,
       timestamp: Date.now(),
-      data: { matchedKeyword, complexity: "major" },
+      data: {
+        keyword: matchedKeyword,
+        classification: "major",
+        reasoning: `The word "${matchedKeyword}" typically indicates broad changes that go beyond single-element edits`,
+        action: "Escalating to CostCalculator for impact assessment"
+      },
     })
   } else {
     traces.push({
       agent: "RequestParser",
       status: "completed",
-      message: "No significant change request detected",
+      message: "Message appears to be conversational or a minor adjustment. No scope triggers found.",
       timestamp: Date.now(),
+      data: {
+        scannedKeywords: NON_TRIVIAL_KEYWORDS.length,
+        result: "No matches - proceeding without cost check"
+      }
     })
   }
 

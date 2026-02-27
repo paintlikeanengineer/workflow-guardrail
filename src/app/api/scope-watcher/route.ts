@@ -14,9 +14,13 @@ export async function POST(request: NextRequest) {
   traces.push({
     agent: "ScopeWatcher",
     status: "started",
-    message: "Checking image against approved goals",
+    message: "Validating design against approved project goals...",
     timestamp: Date.now(),
-    data: { imageId },
+    data: {
+      imageId,
+      checkingGoals: state.decisions.benchApproved ? ["Bench from Rough C"] : [],
+      detectedElements: detectedObjects.slice(0, 5)
+    },
   })
 
   // RULE: If bench was approved but not detected in image, it's a violation
@@ -42,16 +46,28 @@ export async function POST(request: NextRequest) {
     traces.push({
       agent: "ScopeWatcher",
       status: "violation",
-      message: "Missing approved element: bench with person",
+      message: "Scope violation: Client approved bench element (Rough C) is not present in this design iteration.",
       timestamp: Date.now(),
-      data: output.violations[0],
+      data: {
+        missingGoal: "Bench with person (Rough C)",
+        detectedInImage: detectedObjects.slice(0, 5),
+        confidence: output.confidence,
+        recommendation: "Designer should be notified before sending to avoid client confusion"
+      },
     })
   } else {
     traces.push({
       agent: "ScopeWatcher",
       status: "completed",
-      message: "Image passes all goal checks",
+      message: hasBench
+        ? "All approved elements detected. Design aligns with client-approved goals."
+        : "No scope constraints active. Image is acceptable.",
       timestamp: Date.now(),
+      data: {
+        elementsChecked: state.decisions.benchApproved ? 1 : 0,
+        detectedObjects: detectedObjects.slice(0, 5),
+        result: "PASS"
+      }
     })
   }
 

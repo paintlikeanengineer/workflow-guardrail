@@ -54,7 +54,7 @@ export async function uploadToStage(
   // Write buffer to temp file (PUT requires file path)
   const tempDir = os.tmpdir()
   const tempPath = path.join(tempDir, fileName)
-  fs.writeFileSync(tempPath, fileBuffer)
+  fs.writeFileSync(tempPath, new Uint8Array(fileBuffer))
 
   const stagePath = "@POLICY_DB.PUBLIC.MY_IMAGES"
   const putQuery = `PUT file://${tempPath} ${stagePath} AUTO_COMPRESS=FALSE OVERWRITE=TRUE`

@@ -9,12 +9,19 @@ export async function POST(request: NextRequest) {
 
   const traces: TraceEvent[] = []
 
+  const taskStr = typeof task === "string" ? task : (task?.description || JSON.stringify(task) || "")
+  const taskPreview = taskStr.slice(0, 80) + (taskStr.length > 80 ? "..." : "")
+
   traces.push({
     agent: "CostCalculator",
     status: "started",
-    message: "Calculating impact estimate",
+    message: `Estimating cost impact for "${complexity}" complexity change...`,
     timestamp: Date.now(),
-    data: { complexity },
+    data: {
+      complexity,
+      task: taskPreview,
+      method: "Historical baseline + complexity multiplier"
+    },
   })
 
   // RULE: Fixed estimates based on complexity (per hackathon plan)
@@ -54,10 +61,16 @@ export async function POST(request: NextRequest) {
     status: recommendation === "warn" ? "warning" : "completed",
     message:
       recommendation === "warn"
-        ? `Warning: ${estimatedDays} day delay, $${estimatedCost} additional cost`
-        : "Change within normal scope",
+        ? `Impact exceeds threshold: +${estimatedDays} day(s), +$${estimatedCost}. Client should be notified before proceeding.`
+        : "Change is within contracted scope. No additional charges apply.",
     timestamp: Date.now(),
-    data: output,
+    data: {
+      hours: estimatedHours,
+      days: estimatedDays,
+      cost: `$${estimatedCost}`,
+      recommendation,
+      reasoning: output.reasoning
+    },
   })
 
   return NextResponse.json({

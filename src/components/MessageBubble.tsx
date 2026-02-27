@@ -1,6 +1,8 @@
 "use client"
 
 import { Message } from "@/types"
+import Markdown from "react-markdown"
+import remarkGfm from "remark-gfm"
 
 type Props = {
   message: Message
@@ -30,8 +32,12 @@ export function MessageBubble({ message, isCurrentUser }: Props) {
           </div>
         )}
 
-        {/* Text content */}
-        <p className="text-sm">{message.content}</p>
+        {/* Text content with markdown rendering */}
+        <div className={`text-sm prose prose-sm max-w-none ${isCurrentUser ? "prose-invert" : ""}`}>
+          <Markdown remarkPlugins={[remarkGfm]}>
+            {message.content}
+          </Markdown>
+        </div>
 
         {/* Question card if present */}
         {message.question && (
