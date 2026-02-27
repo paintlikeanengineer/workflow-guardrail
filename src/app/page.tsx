@@ -1,9 +1,10 @@
 "use client"
 
 import { useState } from "react"
-import { ChatThread, ChatInput, TracePanel, ViewToggle, ValidationCard } from "@/components"
+import { ChatThread, ChatInput, TracePanel, ViewToggle, PRDPanel } from "@/components"
 import { Message, TraceEvent, ScopeWatcherOutput, CostCalculatorOutput } from "@/types"
 import threadData from "../../data/thread.json"
+import prdData from "../../data/prd.json"
 
 type PendingValidation = {
   id: string
@@ -19,6 +20,7 @@ export default function Home() {
   const [messages, setMessages] = useState<Message[]>(threadData.messages as Message[])
   const [traces, setTraces] = useState<TraceEvent[]>([])
   const [pendingValidation, setPendingValidation] = useState<PendingValidation | null>(null)
+  const [rightPanelTab, setRightPanelTab] = useState<"trace" | "prd">("trace")
 
   const addTraces = (newTraces: TraceEvent[]) => {
     setTraces((prev) => [...prev, ...newTraces])
@@ -207,9 +209,40 @@ export default function Home() {
         />
       </div>
 
-      {/* Trace panel - 20% */}
-      <div className="w-1/5">
-        <TracePanel traces={traces} />
+      {/* Right panel - 20% */}
+      <div className="w-1/5 flex flex-col bg-gray-900">
+        {/* Tab buttons */}
+        <div className="flex border-b border-gray-700">
+          <button
+            onClick={() => setRightPanelTab("trace")}
+            className={`flex-1 px-3 py-2 text-xs font-medium transition-colors ${
+              rightPanelTab === "trace"
+                ? "bg-gray-800 text-white border-b-2 border-blue-500"
+                : "text-gray-400 hover:text-white hover:bg-gray-800/50"
+            }`}
+          >
+            Trace
+          </button>
+          <button
+            onClick={() => setRightPanelTab("prd")}
+            className={`flex-1 px-3 py-2 text-xs font-medium transition-colors ${
+              rightPanelTab === "prd"
+                ? "bg-gray-800 text-white border-b-2 border-blue-500"
+                : "text-gray-400 hover:text-white hover:bg-gray-800/50"
+            }`}
+          >
+            PRD
+          </button>
+        </div>
+
+        {/* Panel content */}
+        <div className="flex-1 overflow-hidden">
+          {rightPanelTab === "trace" ? (
+            <TracePanel traces={traces} />
+          ) : (
+            <PRDPanel prd={prdData} />
+          )}
+        </div>
       </div>
     </div>
   )

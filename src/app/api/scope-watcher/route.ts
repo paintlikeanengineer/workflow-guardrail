@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import { ScopeWatcherOutput, TraceEvent } from "@/types"
 import { getState } from "@/lib/state"
+import { generateExplanation } from "@/lib/snowflake"
 
 // POST /api/scope-watcher
 // Validates uploaded images against approved goals
@@ -35,11 +36,21 @@ export async function POST(request: NextRequest) {
   }
 
   if (state.decisions.benchApproved && !hasBench) {
+    // Generate friendly LLM explanation
+    let friendlyMessage = "The approved bench element is missing from this design"
+    try {
+      friendlyMessage = await generateExplanation("scope_violation", {
+        missingElement: "bench with person from Rough C"
+      })
+    } catch (err) {
+      console.error("Failed to generate explanation:", err)
+    }
+
     output.valid = false
     output.violations.push({
       goalId: "goal-bench",
       goalText: "Include bench with person from Rough C",
-      reason: "The approved bench element is missing from this design",
+      reason: friendlyMessage,
       severity: "high",
     })
 

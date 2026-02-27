@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
 import { CostCalculatorOutput, TraceEvent } from "@/types"
+import { generateExplanation } from "@/lib/snowflake"
 
 // POST /api/cost-calculator
 // Estimates time and cost impact of a change request
@@ -48,11 +49,26 @@ export async function POST(request: NextRequest) {
     recommendation = "proceed"
   }
 
+  // Generate friendly LLM explanation for warnings
+  let reasoning = `This ${complexity} change would require approximately ${estimatedDays} additional day(s) and may incur $${estimatedCost} in additional fees based on your contract terms.`
+
+  if (recommendation === "warn") {
+    try {
+      reasoning = await generateExplanation("cost_warning", {
+        days: estimatedDays,
+        cost: estimatedCost,
+        changeRequest: taskPreview
+      })
+    } catch (err) {
+      console.error("Failed to generate explanation:", err)
+    }
+  }
+
   const output: CostCalculatorOutput = {
     estimatedHours,
     estimatedDays,
     estimatedCost,
-    reasoning: `This ${complexity} change would require approximately ${estimatedDays} additional day(s) and may incur $${estimatedCost} in additional fees based on your contract terms.`,
+    reasoning,
     recommendation,
   }
 
