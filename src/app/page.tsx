@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { ChatThread, ChatInput, TracePanel, ViewToggle, PRDPanel } from "@/components"
+import { ChatThread, ChatInput, TracePanel, ViewToggle, PRDPanel, Toast } from "@/components"
 import { Message, TraceEvent, ScopeWatcherOutput, CostCalculatorOutput } from "@/types"
 import threadData from "../../data/thread.json"
 import prdData from "../../data/prd.json"
@@ -21,6 +21,7 @@ export default function Home() {
   const [traces, setTraces] = useState<TraceEvent[]>([])
   const [pendingValidation, setPendingValidation] = useState<PendingValidation | null>(null)
   const [rightPanelTab, setRightPanelTab] = useState<"trace" | "prd">("trace")
+  const [toast, setToast] = useState<{ message: string; type: "success" | "info" } | null>(null)
 
   const addTraces = (newTraces: TraceEvent[]) => {
     setTraces((prev) => [...prev, ...newTraces])
@@ -161,6 +162,18 @@ export default function Home() {
       // Send the message
       setMessages((prev) => [...prev, pendingValidation.previewMessage])
     }
+
+    // Show toast based on action and view
+    if (action === "fix") {
+      if (currentView === "designer") {
+        // Designer chose to fix scope issue
+        setToast({ message: "Saved 24hr iteration cycle!", type: "success" })
+      } else {
+        // Client chose not to send costly change
+        setToast({ message: "Good call! Avoided scope creep.", type: "success" })
+      }
+    }
+
     // Both "fix" and "send" clear the validation (and preview disappears)
     setPendingValidation(null)
   }
@@ -171,6 +184,14 @@ export default function Home() {
 
   return (
     <div className="flex h-screen bg-gray-100">
+      {/* Toast notification */}
+      {toast && (
+        <Toast
+          message={toast.message}
+          type={toast.type}
+          onClose={() => setToast(null)}
+        />
+      )}
       {/* Chat area - 80% */}
       <div className="flex flex-col w-4/5 border-r border-gray-200">
         {/* Header */}
