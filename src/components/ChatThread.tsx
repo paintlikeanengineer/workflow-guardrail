@@ -133,7 +133,8 @@ export function ChatThread({
         </>
       )}
 
-      <div ref={bottomRef} />
+      {/* Extra space at bottom so messages aren't hidden by video controls during recording */}
+      <div ref={bottomRef} className="h-24" />
     </div>
   )
 }
