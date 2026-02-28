@@ -166,10 +166,59 @@ export default function Home() {
     setMessages((prev) => [...prev, newMessage])
   }
 
-  const handleValidationAction = (action: "fix" | "send") => {
+  const handleValidationAction = async (action: "fix" | "send") => {
     if (action === "send" && pendingValidation) {
       // Send the message
       setMessages((prev) => [...prev, pendingValidation.previewMessage])
+
+      // If this is a cost warning approval, update PRD in Google Drive
+      if (pendingValidation.type === "cost_warning" && pendingValidation.data) {
+        const costData = pendingValidation.data as CostCalculatorOutput
+
+        addTraces([{
+          agent: "PRD-Sync",
+          status: "started",
+          message: "Updating PRD in Google Drive...",
+          timestamp: Date.now(),
+        }])
+
+        try {
+          const res = await fetch("/api/drive/update-prd", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              deltaDays: costData.estimatedDays,
+              deltaCostUsd: costData.estimatedCost,
+              rationale: costData.reasoning,
+            }),
+          })
+          const result = await res.json()
+
+          if (result.success) {
+            addTraces([{
+              agent: "PRD-Sync",
+              status: "completed",
+              message: `PRD updated: ${result.fileName} [${new Date(result.timestamp).toLocaleTimeString()}]`,
+              timestamp: Date.now(),
+            }])
+            setToast({ message: "PRD updated in Google Drive", type: "info" })
+          } else {
+            addTraces([{
+              agent: "PRD-Sync",
+              status: "warning",
+              message: result.error || "Could not update PRD (Drive not connected)",
+              timestamp: Date.now(),
+            }])
+          }
+        } catch {
+          addTraces([{
+            agent: "PRD-Sync",
+            status: "warning",
+            message: "PRD sync skipped (Drive not connected)",
+            timestamp: Date.now(),
+          }])
+        }
+      }
     }
 
     // Show toast based on action and view

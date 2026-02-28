@@ -100,4 +100,46 @@ export async function downloadDriveFile(fileId: string): Promise<string> {
   }
 }
 
+// Append content to a Google Drive file (for PRD updates)
+export async function appendToDriveFile(
+  fileId: string,
+  content: string
+): Promise<{ success: boolean; timestamp: string }> {
+  try {
+    const connectedAccountId = await getConnectedAccount()
+    if (!connectedAccountId) {
+      throw new Error("No connected Google Drive account")
+    }
+
+    const timestamp = new Date().toISOString()
+
+    // Use GOOGLEDRIVE_APPEND_TEXT action to add content
+    await composio.actions.execute({
+      actionName: "GOOGLEDRIVE_APPEND_TEXT",
+      requestBody: {
+        connectedAccountId,
+        input: {
+          file_id: fileId,
+          text: `\n\n---\n[${timestamp}] BUDGET AMENDMENT\n${content}`,
+        },
+      },
+    })
+
+    return { success: true, timestamp }
+  } catch (error) {
+    console.error("Error appending to Drive file:", error)
+    throw error
+  }
+}
+
+// Find PRD file in Drive
+export async function findPrdFile(): Promise<DriveFile | null> {
+  try {
+    const files = await listDriveFiles("name contains 'PRD' and trashed = false")
+    return files.length > 0 ? files[0] : null
+  } catch {
+    return null
+  }
+}
+
 export { composio }
