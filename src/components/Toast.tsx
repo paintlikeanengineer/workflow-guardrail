@@ -2,11 +2,12 @@
 
 import { useEffect, useState } from "react"
 
-type ToastType = "success" | "info" | "warning"
+type ToastType = "success" | "info" | "warning" | "blocked"
 
 type Props = {
   message: string
   type?: ToastType
+  subtext?: string
   duration?: number
   onClose: () => void
 }
@@ -15,15 +16,17 @@ const typeStyles: Record<ToastType, string> = {
   success: "bg-green-600 text-white",
   info: "bg-blue-600 text-white",
   warning: "bg-amber-500 text-white",
+  blocked: "bg-red-600 text-white",
 }
 
 const typeIcons: Record<ToastType, string> = {
   success: "✓",
   info: "ℹ",
   warning: "⚠",
+  blocked: "🛑",
 }
 
-export function Toast({ message, type = "success", duration = 3000, onClose }: Props) {
+export function Toast({ message, type = "success", subtext, duration = 3000, onClose }: Props) {
   const [isExiting, setIsExiting] = useState(false)
 
   useEffect(() => {
@@ -49,7 +52,10 @@ export function Toast({ message, type = "success", duration = 3000, onClose }: P
         ${isExiting ? "animate-toastOut" : "animate-toastIn"}`}
     >
       <span className="text-lg">{typeIcons[type]}</span>
-      <p className="text-sm font-medium">{message}</p>
+      <div>
+        <p className="text-sm font-medium">{message}</p>
+        {subtext && <p className="text-xs opacity-80">{subtext}</p>}
+      </div>
     </div>
   )
 }

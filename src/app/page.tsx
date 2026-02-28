@@ -31,7 +31,7 @@ export default function Home() {
   const [traces, setTraces] = useState<TraceEvent[]>([])
   const [pendingValidation, setPendingValidation] = useState<PendingValidation | null>(null)
   const [rightPanelTab, setRightPanelTab] = useState<"trace" | "prd">("trace")
-  const [toast, setToast] = useState<{ message: string; type: "success" | "info" } | null>(null)
+  const [toast, setToast] = useState<{ message: string; type: "success" | "info" | "warning" | "blocked"; subtext?: string } | null>(null)
   const [isThinking, setIsThinking] = useState(false)
   const [prd, setPrd] = useState<PRDData>(prdData as PRDData)
 
@@ -93,6 +93,12 @@ export default function Home() {
 
           if (costData.output.recommendation === "warn") {
             setIsThinking(false)
+            // Show toast for held message
+            setToast({
+              message: "CostCalculator held this message",
+              subtext: `+${costData.output.estimatedDays} day(s), +$${costData.output.estimatedCost} — requires confirmation`,
+              type: "warning",
+            })
             // Show preview + validation inline
             setPendingValidation({
               id: `card-${Date.now()}`,
@@ -182,6 +188,12 @@ export default function Home() {
       setIsThinking(false)
 
       if (!scopeData.output.valid) {
+        // Show toast for blocked message
+        setToast({
+          message: "ScopeWatcher blocked this message",
+          subtext: scopeData.output.violations[0]?.goalText || "PRD conflict detected",
+          type: "blocked",
+        })
         // Show preview + validation inline
         setPendingValidation({
           id: `card-${Date.now()}`,
@@ -282,6 +294,8 @@ export default function Home() {
         <Toast
           message={toast.message}
           type={toast.type}
+          subtext={toast.subtext}
+          duration={4000}
           onClose={() => setToast(null)}
         />
       )}

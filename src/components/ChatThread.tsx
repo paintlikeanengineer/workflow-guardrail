@@ -95,14 +95,32 @@ export function ChatThread({
       {/* Pending preview message (grayed out) + Validation card */}
       {pendingValidation && (
         <>
-          {/* Preview message with opacity */}
-          <div className="opacity-60">
-            <MessageBubble
-              message={pendingValidation.previewMessage}
-              isCurrentUser={pendingValidation.previewMessage.sender === currentView}
-              onSendAnnotatedImage={onSendAnnotatedImage}
-              onAnswerQuestion={onAnswerQuestion}
-            />
+          {/* Preview message with opacity + held pill */}
+          <div className="relative">
+            <div className="opacity-50">
+              <MessageBubble
+                message={pendingValidation.previewMessage}
+                isCurrentUser={pendingValidation.previewMessage.sender === currentView}
+                onSendAnnotatedImage={onSendAnnotatedImage}
+                onAnswerQuestion={onAnswerQuestion}
+              />
+            </div>
+            {/* Held for validation pill */}
+            <div className={`absolute top-0 right-4 transform -translate-y-1/2 px-2.5 py-1 rounded-full text-xs font-medium shadow-md flex items-center gap-1.5 ${
+              pendingValidation.type === "scope_violation"
+                ? "bg-red-500 text-white"
+                : "bg-amber-500 text-white"
+            }`}>
+              <span className="relative flex h-2 w-2">
+                <span className={`animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 ${
+                  pendingValidation.type === "scope_violation" ? "bg-red-300" : "bg-amber-300"
+                }`}></span>
+                <span className={`relative inline-flex rounded-full h-2 w-2 ${
+                  pendingValidation.type === "scope_violation" ? "bg-red-200" : "bg-amber-200"
+                }`}></span>
+              </span>
+              {pendingValidation.type === "scope_violation" ? "Blocked" : "Held for review"}
+            </div>
           </div>
 
           {/* Validation card inline */}

@@ -97,6 +97,89 @@ function groupTracesByAgent(traces: TraceEvent[]): AgentGroup[] {
   return groups
 }
 
+// Generate one-line summary for judges
+function getAgentSummary(group: AgentGroup): { text: string; outcome: string } | null {
+  const agent = group.agent
+  const status = group.finalStatus
+  const lastTrace = group.traces[group.traces.length - 1]
+  const data = lastTrace.data as Record<string, unknown> | undefined
+
+  if (agent === "ScopeWatcher") {
+    if (status === "violation") {
+      return { text: "PRD conflict", outcome: "blocked" }
+    } else if (status === "completed") {
+      return { text: "PRD check", outcome: "passed" }
+    }
+  } else if (agent === "CostCalculator") {
+    if (status === "warning") {
+      const days = data?.days || "?"
+      const cost = data?.cost || "?"
+      return { text: `+${days} days, ${cost}`, outcome: "held" }
+    } else if (status === "completed") {
+      return { text: "Within threshold", outcome: "auto-approved" }
+    }
+  } else if (agent === "ChangeTriage") {
+    if (status === "warning") {
+      const category = data?.category || "change"
+      return { text: `${category} detected`, outcome: "escalated" }
+    } else if (status === "completed") {
+      return { text: "No scope impact", outcome: "passed" }
+    }
+  } else if (agent === "ScopeScribe") {
+    if (status === "completed") {
+      return { text: "Client decision", outcome: "recorded" }
+    }
+  } else if (agent === "PRD-Sync") {
+    if (status === "completed") {
+      return { text: "Amendment", outcome: "saved" }
+    }
+  } else if (agent === "IntentLens") {
+    if (status === "completed") {
+      const isMinor = data?.isMinorOverall
+      return { text: "Annotation analyzed", outcome: isMinor ? "minor change" : "key element" }
+    }
+  }
+  return null
+}
+
+const outcomeColors: Record<string, string> = {
+  blocked: "bg-red-500/80 text-white",
+  held: "bg-amber-500/80 text-white",
+  escalated: "bg-amber-500/80 text-white",
+  passed: "bg-green-500/80 text-white",
+  recorded: "bg-blue-500/80 text-white",
+  saved: "bg-blue-500/80 text-white",
+  "auto-approved": "bg-green-500/80 text-white",
+  "minor change": "bg-green-500/80 text-white",
+  "key element": "bg-amber-500/80 text-white",
+}
+
+// Tool calls (external services) and System of Record (our data)
+function getAgentResources(agent: AgentName): { tools: string[]; records: string[] } {
+  switch (agent) {
+    case "ScopeWatcher":
+      return { tools: ["Cortex Vision"], records: ["PRD"] }
+    case "CostCalculator":
+      return { tools: ["Cortex LLM"], records: ["History"] }
+    case "ChangeTriage":
+      return { tools: ["Cortex LLM"], records: [] }
+    case "ScopeScribe":
+      return { tools: [], records: ["PRD"] }
+    case "PRD-Sync":
+      return { tools: [], records: ["PRD"] }
+    case "IntentLens":
+      return { tools: [], records: ["Regions"] }
+    default:
+      return { tools: [], records: [] }
+  }
+}
+
+// Tools = external AI services (Snowflake Cortex)
+const toolBadgeStyle = "bg-cyan-600/30 text-cyan-300 border-cyan-500/50"
+
+// System of Record = our data sources
+const recordBadgeStyle = "bg-amber-600/30 text-amber-300 border-amber-500/50"
+
 function AgentGroupCard({ group, isNew, isActive }: { group: AgentGroup; isNew: boolean; isActive: boolean }) {
   const [expanded, setExpanded] = useState(false)
   const hasMultipleTraces = group.traces.length > 1
@@ -105,6 +188,8 @@ function AgentGroupCard({ group, isNew, isActive }: { group: AgentGroup; isNew: 
   const hasExpandableData = group.traces.some(
     t => t.data && typeof t.data === "object" && Object.keys(t.data as object).length > 0
   )
+
+  const summary = getAgentSummary(group)
 
   return (
     <div
@@ -141,8 +226,50 @@ function AgentGroupCard({ group, isNew, isActive }: { group: AgentGroup; isNew: 
           </span>
         </div>
 
-        {/* Show last message as summary */}
-        <p className="text-xs text-gray-300 mt-1.5 leading-relaxed">
+        {/* Tool & Record badges - two rows */}
+        {(() => {
+          const { tools, records } = getAgentResources(group.agent)
+          if (tools.length === 0 && records.length === 0) return null
+          return (
+            <div className="flex flex-col gap-1 mt-1.5">
+              {tools.length > 0 && (
+                <div className="flex items-center gap-1">
+                  <span className="text-[8px] text-gray-500 w-8">Tools</span>
+                  {tools.map((tool) => (
+                    <span key={tool} className={`text-[9px] px-1.5 py-0.5 rounded border ${toolBadgeStyle}`}>
+                      {tool}
+                    </span>
+                  ))}
+                </div>
+              )}
+              {records.length > 0 && (
+                <div className="flex items-center gap-1">
+                  <span className="text-[8px] text-gray-500 w-8">Data</span>
+                  {records.map((rec) => (
+                    <span key={rec} className={`text-[9px] px-1.5 py-0.5 rounded border ${recordBadgeStyle}`}>
+                      {rec}
+                    </span>
+                  ))}
+                </div>
+              )}
+            </div>
+          )
+        })()}
+
+        {/* One-line summary for judges */}
+        {summary && (
+          <div className="flex items-center gap-2 mt-1.5">
+            <span className="text-[10px] text-gray-400">{summary.text}</span>
+            <span className="text-[10px] font-medium rounded px-1.5 py-0.5" style={{ fontSize: "9px" }}>
+              <span className={`${outcomeColors[summary.outcome] || "bg-gray-600 text-white"} px-1.5 py-0.5 rounded`}>
+                → {summary.outcome}
+              </span>
+            </span>
+          </div>
+        )}
+
+        {/* Show last message as detail */}
+        <p className="text-xs text-gray-400 mt-1 leading-relaxed line-clamp-2">
           {group.traces[group.traces.length - 1].message}
         </p>
       </div>
