@@ -17,9 +17,8 @@
     {
       "messageId": "msg-001",
       "sender": "client",
-      "type": "doc",
-      "content": "Hi Athena! Here's the brief for our advertising poster project. Excited to work with you!",
-      "attachments": ["/docs/brief.pdf"],
+      "type": "text",
+      "content": "Hi Athena! Here's the brief for our advertising poster project. Excited to work with you!\n\n📁 [Project Brief - Eye Clinics of San Jose](https://drive.google.com/file/d/PRD_eye_clinics)",
       "timestamp": "2026-02-15T10:00:00Z"
     },
     {
@@ -62,25 +61,17 @@
         "text": "Do you like the anonymized person on the bench?",
         "options": ["Yes", "No"]
       }
-    },
-    {
-      "messageId": "msg-006",
-      "sender": "client",
-      "type": "text",
-      "content": "Yes! It makes the space feel welcoming. Keep it.",
-      "timestamp": "2026-02-20T14:32:00Z"
-    },
-    {
-      "messageId": "msg-007",
-      "sender": "designer",
-      "type": "text",
-      "content": "Perfect. Moving to detailed illustration now. Will share progress in a few days.",
-      "timestamp": "2026-02-20T14:35:00Z"
     }
   ],
 
   "_demoNotes": {
-    "nextMessage": "Designer uploads v1_no_bench.png - triggers ScopeWatcher catch",
+    "demoFlow": [
+      "1. Client clicks YES on bench question",
+      "2. Designer uploads v1_no_bench.png → ScopeWatcher catches missing bench",
+      "3. Designer uploads v2_with_bench.jpg → Passes validation",
+      "4. Client annotates small area → IntentLens shows minor change",
+      "5. Client types 'different angle' → CostCalculator warns about cost"
+    ],
     "catch1": {
       "trigger": "Designer uploads image without bench",
       "agent": "ScopeWatcher",
@@ -88,7 +79,7 @@
       "action": "Show validation card asking designer to fix"
     },
     "catch2": {
-      "trigger": "Client requests 'deeper blue accent'",
+      "trigger": "Client requests 'different angle' or 'deeper blue'",
       "agent": "CostCalculator",
       "estimate": { "hours": 4, "days": 2, "cost": 200 },
       "action": "Show validation card warning about scope impact"
