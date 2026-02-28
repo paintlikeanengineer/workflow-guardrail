@@ -13,7 +13,12 @@ Scope creep costs freelancers up to [**£8,000/year**](https://underpinned.com/s
 
 ## The Solution
 
-Workflow Guardrail intercepts messages between designers and clients, using AI agents to:
+Workflow Guardrail intercepts messages between designers and clients, using AI agents to catch scope-changing requests before they're sent.
+
+![Validation Card](./public/screenshots/Validation_held1.png)
+*CostCalculator holds a $1600 change request for client confirmation*
+
+**Agents:**
 
 1. **ScopeWatcher** - Validates design deliverables against the PRD using Snowflake Cortex Vision
 2. **CostCalculator** - Estimates impact of change requests using historical edit data from Snowflake
