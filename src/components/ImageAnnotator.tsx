@@ -24,7 +24,7 @@ type Tool = "select" | "rect" | "circle" | "arrow" | "text"
 
 type Props = {
   imageUrl: string
-  onSave?: (annotations: Annotation[]) => void
+  onSave?: (imageBlob: Blob, annotations: Annotation[]) => void
   onClose?: () => void
 }
 
@@ -195,8 +195,21 @@ export function ImageAnnotator({ imageUrl, onSave, onClose }: Props) {
     }
   }
 
-  const handleSave = () => {
-    onSave?.(annotations)
+  const handleSave = async () => {
+    if (!stageRef.current) return
+
+    // Hide transformer before export
+    setSelectedId(null)
+
+    // Wait for re-render
+    await new Promise(resolve => setTimeout(resolve, 50))
+
+    // Export stage as blob
+    const dataUrl = stageRef.current.toDataURL({ pixelRatio: 2 })
+    const response = await fetch(dataUrl)
+    const blob = await response.blob()
+
+    onSave?.(blob, annotations)
   }
 
   const handleTextSubmit = () => {

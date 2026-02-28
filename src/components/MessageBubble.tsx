@@ -55,9 +55,11 @@ export function MessageBubble({ message, isCurrentUser }: Props) {
           <ImageAnnotator
             imageUrl={message.attachments[0]}
             onClose={() => setShowAnnotator(false)}
-            onSave={(annotations) => {
+            onSave={(imageBlob, annotations) => {
               console.log("Saved annotations:", annotations)
-              // For now just close - could export annotated image
+              // Create blob URL for the annotated image
+              const annotatedUrl = URL.createObjectURL(imageBlob)
+              setAnnotatedImageUrl(annotatedUrl)
               setShowAnnotator(false)
             }}
           />
