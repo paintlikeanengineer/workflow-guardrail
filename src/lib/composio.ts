@@ -29,12 +29,13 @@ export async function getConnectedAccount(): Promise<string | null> {
     const accounts = await composio.connectedAccounts.list({
       appNames: "googledrive",
     })
-    // Find one for our entity (cast to access entityId which exists at runtime)
-    type AccountWithEntity = { id: string; entityId?: string }
-    const items = accounts.items as unknown as AccountWithEntity[]
-    const account = items?.find((a) => a.entityId === ENTITY_ID)
+    // Just get the first active googledrive account
+    const items = accounts.items as Array<{ id: string; status?: string }>
+    const account = items?.find((a) => a.status === "ACTIVE") || items?.[0]
+    console.log("Found connected accounts:", items?.length, "Using:", account?.id)
     return account?.id || null
-  } catch {
+  } catch (err) {
+    console.error("Error getting connected account:", err)
     return null
   }
 }

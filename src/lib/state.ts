@@ -17,14 +17,14 @@ export type ThreadState = {
 
 // Seeded demo state:
 // - selectedRough = "C" (client chose this)
-// - benchApproved = true (client said "Yes" to bench person)
+// - benchApproved = false (will be set to true when client clicks Yes)
 // - includesBench = false (v1 image will be missing it - triggers catch)
 export const demoState: ThreadState = {
   threadId: "thread-eye-clinics-001",
   currentView: "designer",
   decisions: {
     selectedRough: "C",
-    benchApproved: true,
+    benchApproved: false, // Will be set when client answers
   },
   latestDesign: {
     imageId: null,

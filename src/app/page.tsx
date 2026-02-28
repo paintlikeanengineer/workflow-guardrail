@@ -1,10 +1,20 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { ChatThread, ChatInput, TracePanel, ViewToggle, PRDPanel, Toast } from "@/components"
 import { Message, TraceEvent, ScopeWatcherOutput, CostCalculatorOutput } from "@/types"
 import threadData from "../../data/thread.json"
 import prdData from "../../data/prd.json"
+
+type PRDData = typeof prdData & {
+  amendments?: Array<{
+    timestamp: string
+    deltaDays: number
+    deltaCostUsd: number
+    rationale: string
+    status: string
+  }>
+}
 
 type PendingValidation = {
   id: string
@@ -23,6 +33,24 @@ export default function Home() {
   const [rightPanelTab, setRightPanelTab] = useState<"trace" | "prd">("trace")
   const [toast, setToast] = useState<{ message: string; type: "success" | "info" } | null>(null)
   const [isThinking, setIsThinking] = useState(false)
+  const [prd, setPrd] = useState<PRDData>(prdData as PRDData)
+
+  const refreshPrd = useCallback(async () => {
+    try {
+      const res = await fetch("/api/prd")
+      if (res.ok) {
+        const data = await res.json()
+        setPrd(data)
+      }
+    } catch (err) {
+      console.error("Failed to refresh PRD:", err)
+    }
+  }, [])
+
+  // Load PRD on mount
+  useEffect(() => {
+    refreshPrd()
+  }, [refreshPrd])
 
   const addTraces = (newTraces: TraceEvent[]) => {
     setTraces((prev) => [...prev, ...newTraces])
@@ -30,7 +58,7 @@ export default function Home() {
 
   const handleSendMessage = async (content: string) => {
     const newMessage: Message = {
-      messageId: `msg-${Date.now()}`,
+      messageId: `msg-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
       sender: currentView,
       type: "text",
       content,
@@ -90,7 +118,7 @@ export default function Home() {
     const imageUrl = URL.createObjectURL(file)
 
     const newMessage: Message = {
-      messageId: `msg-${Date.now()}`,
+      messageId: `msg-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
       sender: currentView,
       type: "image",
       content: "Here's the latest version",
@@ -178,7 +206,7 @@ export default function Home() {
         addTraces([{
           agent: "PRD-Sync",
           status: "started",
-          message: "Updating PRD in Google Drive...",
+          message: "Updating PRD...",
           timestamp: Date.now(),
         }])
 
@@ -198,10 +226,13 @@ export default function Home() {
             addTraces([{
               agent: "PRD-Sync",
               status: "completed",
-              message: `PRD updated: ${result.fileName} [${new Date(result.timestamp).toLocaleTimeString()}]`,
+              message: `PRD updated: ${result.fileName} (now ${result.newTotalDays} days) [${new Date(result.timestamp).toLocaleTimeString()}]`,
               timestamp: Date.now(),
             }])
-            setToast({ message: "PRD updated in Google Drive", type: "info" })
+            setToast({ message: "PRD updated with budget amendment", type: "info" })
+            // Refresh PRD panel to show amendment
+            await refreshPrd()
+            setRightPanelTab("prd")
           } else {
             addTraces([{
               agent: "PRD-Sync",
@@ -275,6 +306,9 @@ export default function Home() {
           pendingValidation={pendingValidation}
           onValidationAction={handleValidationAction}
           onSendAnnotatedImage={async (imageUrl, annotations, canvasWidth, canvasHeight, sourceImageName) => {
+            // Generate messageId upfront to avoid duplicate keys from rapid calls
+            const messageId = `msg-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
+
             // If client is annotating, run IntentLens
             if (currentView === "client" && annotations.length > 0) {
               addTraces([{
@@ -320,7 +354,7 @@ export default function Home() {
             }
 
             const newMessage: Message = {
-              messageId: `msg-${Date.now()}`,
+              messageId,
               sender: currentView,
               type: "image",
               content: "Here's the marked-up version",
@@ -329,21 +363,75 @@ export default function Home() {
             }
             setMessages((prev) => [...prev, newMessage])
           }}
-          onAnswerQuestion={(messageId, answer) => {
+          onAnswerQuestion={async (messageId, answer) => {
+            // Find the message to get the question text
+            const msg = messages.find((m) => m.messageId === messageId)
+            const questionText = msg?.question?.text || "Decision"
+
+            // Update local state
             setMessages((prev) =>
-              prev.map((msg) =>
-                msg.messageId === messageId && msg.question
+              prev.map((m) =>
+                m.messageId === messageId && m.question
                   ? {
-                      ...msg,
+                      ...m,
                       question: {
-                        ...msg.question,
+                        ...m.question,
                         answer,
                         answeredAt: new Date().toISOString(),
                       },
                     }
-                  : msg
+                  : m
               )
             )
+
+            // Add goal to PRD via ScopeScribe
+            addTraces([{
+              agent: "ScopeScribe",
+              status: "started",
+              message: `Recording client decision: "${answer}"`,
+              timestamp: Date.now(),
+            }])
+
+            try {
+              const res = await fetch("/api/prd/add-goal", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                  questionId: msg?.question?.questionId || messageId,
+                  question: questionText,
+                  answer,
+                }),
+              })
+              const result = await res.json()
+
+              if (result.success) {
+                addTraces([{
+                  agent: "ScopeScribe",
+                  status: "completed",
+                  message: `Goal added: "${questionText}: ${answer}"`,
+                  timestamp: Date.now(),
+                }])
+                await refreshPrd()
+
+                // If this is the bench question, update the state for ScopeWatcher
+                if (questionText.toLowerCase().includes("bench")) {
+                  const benchApproved = answer.toLowerCase() === "yes"
+                  await fetch("/api/state/bench-approved", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ approved: benchApproved }),
+                  })
+                }
+              }
+            } catch (err) {
+              console.error("Failed to add goal:", err)
+              addTraces([{
+                agent: "ScopeScribe",
+                status: "error",
+                message: "Failed to record decision",
+                timestamp: Date.now(),
+              }])
+            }
           }}
           isThinking={isThinking}
         />
@@ -391,7 +479,7 @@ export default function Home() {
           {rightPanelTab === "trace" ? (
             <TracePanel traces={traces} />
           ) : (
-            <PRDPanel prd={prdData} />
+            <PRDPanel prd={prd} />
           )}
         </div>
       </div>

@@ -1,37 +1,78 @@
 import { NextRequest, NextResponse } from "next/server"
-import { findPrdFile, appendToDriveFile } from "@/lib/composio"
+import { readFileSync, writeFileSync } from "fs"
+import { join } from "path"
 
-// POST /api/drive/update-prd - Append budget amendment to PRD
+type Amendment = {
+  timestamp: string
+  deltaDays: number
+  deltaCostUsd: number
+  rationale: string
+  status: string
+}
+
+type PRDData = {
+  prdId: string
+  projectTitle: string
+  clientName: string
+  designerName: string
+  brief: {
+    description: string
+    style: string
+    referenceImageUrl: string
+  }
+  timeline: {
+    totalDays: number
+    phases: Array<{ name: string; week: number }>
+    currentDay: number
+    currentPhase: string
+  }
+  terms: {
+    freeIterationsUntil: string
+    hourlyRateAfter: number
+    currency: string
+  }
+  summary: string
+  amendments?: Amendment[]
+}
+
+// POST /api/drive/update-prd - Append budget amendment to local PRD JSON
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
     const { deltaDays, deltaCostUsd, rationale } = body
 
-    // Find the PRD file
-    const prdFile = await findPrdFile()
-    if (!prdFile) {
-      return NextResponse.json(
-        { error: "PRD file not found in Google Drive" },
-        { status: 404 }
-      )
+    // Read the current PRD
+    const prdPath = join(process.cwd(), "data", "prd.json")
+    const prdContent = readFileSync(prdPath, "utf-8")
+    const prd: PRDData = JSON.parse(prdContent)
+
+    // Create amendment entry
+    const timestamp = new Date().toISOString()
+    const amendment: Amendment = {
+      timestamp,
+      deltaDays,
+      deltaCostUsd,
+      rationale,
+      status: "APPROVED BY CLIENT",
     }
 
-    // Build the amendment text
-    const amendment = [
-      `Timeline Extension: +${deltaDays} days`,
-      `Budget Increase: +$${deltaCostUsd}`,
-      `Rationale: ${rationale}`,
-      `Status: APPROVED BY CLIENT`,
-    ].join("\n")
+    // Add to amendments array
+    if (!prd.amendments) {
+      prd.amendments = []
+    }
+    prd.amendments.push(amendment)
 
-    // Append to the file
-    const result = await appendToDriveFile(prdFile.id, amendment)
+    // Update timeline totals
+    prd.timeline.totalDays += deltaDays
+
+    // Write back
+    writeFileSync(prdPath, JSON.stringify(prd, null, 2))
 
     return NextResponse.json({
       success: true,
-      fileId: prdFile.id,
-      fileName: prdFile.name,
-      timestamp: result.timestamp,
+      fileName: "prd.json",
+      timestamp,
+      newTotalDays: prd.timeline.totalDays,
     })
   } catch (error) {
     console.error("Error updating PRD:", error)
