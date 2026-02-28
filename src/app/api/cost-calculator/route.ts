@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
 import { CostCalculatorOutput, TraceEvent } from "@/types"
-import { generateExplanation, estimateCostFromHistory } from "@/lib/snowflake"
+import { generateExplanation, estimateCostFromHistory, getEditHistoryFromSnowflake, EditHistoryRecord } from "@/lib/snowflake"
 import editHistoryData from "../../../../data/edit-history.json"
 import { readFileSync } from "fs"
 import { join } from "path"
@@ -18,9 +18,9 @@ function getAutoApproveThreshold(): { maxHours: number; maxCost: number } {
     const prdContent = readFileSync(prdPath, "utf-8")
     const prd = JSON.parse(prdContent)
     const terms = prd.terms as PRDTerms
-    return terms.autoApproveThreshold || { maxHours: 2, maxCost: 100 }
+    return terms.autoApproveThreshold || { maxHours: 3, maxCost: 300 }
   } catch {
-    return { maxHours: 2, maxCost: 100 }
+    return { maxHours: 3, maxCost: 300 }
   }
 }
 
@@ -35,21 +35,38 @@ export async function POST(request: NextRequest) {
   const taskStr = typeof task === "string" ? task : (task?.description || JSON.stringify(task) || "")
   const taskPreview = taskStr.slice(0, 80) + (taskStr.length > 80 ? "..." : "")
 
+  // Try to fetch edit history from Snowflake, fall back to local JSON
+  let editHistory: EditHistoryRecord[] = []
+  let dataSource = "local"
+
+  try {
+    editHistory = await getEditHistoryFromSnowflake()
+    if (editHistory.length > 0) {
+      dataSource = "snowflake"
+    } else {
+      editHistory = editHistoryData.editHistory
+    }
+  } catch (err) {
+    console.log("Snowflake query failed, using local data:", err)
+    editHistory = editHistoryData.editHistory
+  }
+
   traces.push({
     agent: "CostCalculator",
     status: "started",
-    message: `Analyzing request against ${editHistoryData.editHistory.length} historical edits...`,
+    message: `Querying ${editHistory.length} historical edits from ${dataSource === "snowflake" ? "Snowflake" : "cache"}...`,
     timestamp: Date.now(),
     data: {
       request: taskPreview,
-      method: "LLM-powered historical pattern matching"
+      method: "LLM-powered historical pattern matching",
+      dataSource: dataSource === "snowflake" ? "POLICY_DB.PUBLIC.EDIT_HISTORY" : "local cache"
     },
   })
 
   // Use LLM to estimate cost from historical data
   let estimate
   try {
-    estimate = await estimateCostFromHistory(taskStr, editHistoryData.editHistory)
+    estimate = await estimateCostFromHistory(taskStr, editHistory)
   } catch (err) {
     console.error("Cost estimation failed:", err)
     // Fallback to conservative estimate
@@ -122,12 +139,17 @@ export async function POST(request: NextRequest) {
     recommendation,
   }
 
+  // Format time: show hours if < 8, otherwise days
+  const timeStr = estimatedHours < 8
+    ? `${estimatedHours}hr`
+    : `${estimatedDays} day(s)`
+
   traces.push({
     agent: "CostCalculator",
     status: recommendation === "warn" ? "warning" : "completed",
     message:
       recommendation === "warn"
-        ? `Impact assessment: +${estimatedDays} day(s), +$${estimatedCost} (exceeds threshold: ${threshold.maxHours}hr/$${threshold.maxCost})`
+        ? `Impact assessment: +${timeStr}, +$${estimatedCost} (exceeds threshold: ${threshold.maxHours}hr/$${threshold.maxCost})`
         : `Minor change: ~${estimatedHours}hr, $${estimatedCost}. Within auto-approve threshold (${threshold.maxHours}hr/$${threshold.maxCost}).`,
     timestamp: Date.now(),
     data: {

@@ -339,6 +339,55 @@ Return ONLY valid JSON.`
   })
 }
 
+// Query edit history from Snowflake table
+export type EditHistoryRecord = {
+  editId: string
+  clientName: string
+  requestText: string
+  category: string
+  scope: string
+  actualHours: number
+  actualCost: number
+  affectsOtherAssets: boolean
+}
+
+export async function getEditHistoryFromSnowflake(): Promise<EditHistoryRecord[]> {
+  await connectSnowflake()
+
+  const query = `
+    SELECT
+      EDIT_ID as "editId",
+      CLIENT_NAME as "clientName",
+      REQUEST_TEXT as "requestText",
+      CATEGORY as "category",
+      SCOPE as "scope",
+      ACTUAL_HOURS as "actualHours",
+      ACTUAL_COST as "actualCost",
+      AFFECTS_OTHER_ASSETS as "affectsOtherAssets"
+    FROM POLICY_DB.DESIGN_PROJECTS.EDIT_HISTORY
+    ORDER BY EDIT_ID
+    LIMIT 100
+  `
+
+  return new Promise((resolve, reject) => {
+    connection.execute({
+      sqlText: query,
+      complete: (err, stmt, rows) => {
+        if (err) {
+          console.error("Snowflake edit history query error:", err)
+          reject(err)
+        } else if (rows && rows.length > 0) {
+          console.log(`Fetched ${rows.length} edit history records from Snowflake`)
+          resolve(rows as EditHistoryRecord[])
+        } else {
+          console.log("No edit history found in Snowflake")
+          resolve([])
+        }
+      },
+    })
+  })
+}
+
 export async function detectObjectsInImage(imageName: string): Promise<string[]> {
   await connectSnowflake()
 

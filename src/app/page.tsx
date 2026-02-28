@@ -93,10 +93,13 @@ export default function Home() {
 
           if (costData.output.recommendation === "warn") {
             setIsThinking(false)
+            // Format time: show hours if < 8, otherwise days
+            const hours = costData.output.estimatedHours
+            const timeStr = hours < 8 ? `${hours}hr` : `${costData.output.estimatedDays} day(s)`
             // Show toast for held message
             setToast({
               message: "CostCalculator held this message",
-              subtext: `+${costData.output.estimatedDays} day(s), +$${costData.output.estimatedCost} — requires confirmation`,
+              subtext: `+${timeStr}, +$${costData.output.estimatedCost} — requires confirmation`,
               type: "warning",
             })
             // Show preview + validation inline
@@ -104,7 +107,7 @@ export default function Home() {
               id: `card-${Date.now()}`,
               type: "cost_warning",
               title: "Impact Warning",
-              message: `This change would add ${costData.output.estimatedDays} day(s) and $${costData.output.estimatedCost} to the project. Still send?`,
+              message: `This change would add ${timeStr} and $${costData.output.estimatedCost} to the project. Still send?`,
               previewMessage: newMessage,
               data: costData.output,
             })

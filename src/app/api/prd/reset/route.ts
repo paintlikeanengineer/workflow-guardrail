@@ -28,8 +28,8 @@ const DEFAULT_PRD = {
     hourlyRateAfter: 50,
     currency: "USD",
     autoApproveThreshold: {
-      maxHours: 2,
-      maxCost: 100,
+      maxHours: 3,
+      maxCost: 300,
     },
   },
   summary: "30-day poster project for Eye Clinics of San Jose. Stylized illustration of new facility. Roughs week 1, style pick week 2, final week 3. $50/hr after roughs approved.",

@@ -112,9 +112,12 @@ function getAgentSummary(group: AgentGroup): { text: string; outcome: string } |
     }
   } else if (agent === "CostCalculator") {
     if (status === "warning") {
+      const hours = data?.hours as number | undefined
       const days = data?.days || "?"
       const cost = data?.cost || "?"
-      return { text: `+${days} days, ${cost}`, outcome: "held" }
+      // Show hours if < 8, otherwise days
+      const timeStr = hours !== undefined && hours < 8 ? `${hours}hr` : `${days} days`
+      return { text: `+${timeStr}, ${cost}`, outcome: "held" }
     } else if (status === "completed") {
       return { text: "Within threshold", outcome: "auto-approved" }
     }

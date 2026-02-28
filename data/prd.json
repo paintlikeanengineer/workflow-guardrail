@@ -5,10 +5,10 @@
   "designerName": "Athena",
   "goals": [
     {
-      "id": "goal-1772260012739",
+      "id": "goal-1772305134628",
       "description": "Do you like the anonymized person on the bench?: Yes",
       "source": "Client decision (q-002)",
-      "timestamp": "2026-02-28T06:26:52.739Z"
+      "timestamp": "2026-02-28T18:58:54.628Z"
     }
   ],
   "brief": {
@@ -40,8 +40,8 @@
     "hourlyRateAfter": 50,
     "currency": "USD",
     "autoApproveThreshold": {
-      "maxHours": 2,
-      "maxCost": 100
+      "maxHours": 3,
+      "maxCost": 300
     }
   },
   "summary": "30-day poster project for Eye Clinics of San Jose. Stylized illustration of new facility. Roughs week 1, style pick week 2, final week 3. $50/hr after roughs approved."
