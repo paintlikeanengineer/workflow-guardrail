@@ -1,8 +1,9 @@
 "use client"
 
 import { useState, useRef, useEffect } from "react"
-import { Stage, Layer, Rect, Circle, Line, Image as KonvaImage } from "react-konva"
+import { Stage, Layer, Rect, Circle, Line, Image as KonvaImage, Transformer } from "react-konva"
 import { KonvaEventObject } from "konva/lib/Node"
+import Konva from "konva"
 
 type Annotation = {
   id: string
@@ -12,6 +13,8 @@ type Annotation = {
   width?: number
   height?: number
   radius?: number
+  scaleX?: number
+  scaleY?: number
   points?: number[]
   color: string
 }
@@ -27,14 +30,17 @@ type Props = {
 const COLORS = ["#ef4444", "#f97316", "#eab308", "#22c55e", "#3b82f6", "#8b5cf6"]
 
 export function ImageAnnotator({ imageUrl, onSave, onClose }: Props) {
-  const [tool, setTool] = useState<Tool>("rect")
+  const [tool, setTool] = useState<Tool>("select")
   const [color, setColor] = useState(COLORS[0])
   const [annotations, setAnnotations] = useState<Annotation[]>([])
   const [isDrawing, setIsDrawing] = useState(false)
   const [currentAnnotation, setCurrentAnnotation] = useState<Annotation | null>(null)
+  const [selectedId, setSelectedId] = useState<string | null>(null)
   const [image, setImage] = useState<HTMLImageElement | null>(null)
   const [stageSize, setStageSize] = useState({ width: 600, height: 400 })
   const containerRef = useRef<HTMLDivElement>(null)
+  const transformerRef = useRef<Konva.Transformer>(null)
+  const shapeRefs = useRef<Map<string, Konva.Shape>>(new Map())
 
   // Load image
   useEffect(() => {
@@ -55,14 +61,41 @@ export function ImageAnnotator({ imageUrl, onSave, onClose }: Props) {
     }
   }, [imageUrl])
 
+  // Update transformer when selection changes
+  useEffect(() => {
+    if (selectedId && transformerRef.current) {
+      const node = shapeRefs.current.get(selectedId)
+      if (node) {
+        transformerRef.current.nodes([node])
+        transformerRef.current.getLayer()?.batchDraw()
+      }
+    } else if (transformerRef.current) {
+      transformerRef.current.nodes([])
+      transformerRef.current.getLayer()?.batchDraw()
+    }
+  }, [selectedId])
+
+  const handleStageClick = (e: KonvaEventObject<MouseEvent | TouchEvent>) => {
+    // If clicking on empty area, deselect
+    if (e.target === e.target.getStage()) {
+      setSelectedId(null)
+    }
+  }
+
   const handleMouseDown = (e: KonvaEventObject<MouseEvent | TouchEvent>) => {
+    // In select mode, don't start drawing
     if (tool === "select") return
+
+    // If clicking on existing shape, don't start new drawing
+    const clickedOnEmpty = e.target === e.target.getStage() || e.target.name() === "background"
+    if (!clickedOnEmpty) return
 
     const stage = e.target.getStage()
     if (!stage) return
     const pos = stage.getPointerPosition()
     if (!pos) return
 
+    setSelectedId(null)
     setIsDrawing(true)
     const newAnnotation: Annotation = {
       id: `ann-${Date.now()}`,
@@ -125,18 +158,88 @@ export function ImageAnnotator({ imageUrl, onSave, onClose }: Props) {
   }
 
   const handleUndo = () => {
-    setAnnotations(annotations.slice(0, -1))
+    const newAnnotations = annotations.slice(0, -1)
+    setAnnotations(newAnnotations)
+    setSelectedId(null)
   }
 
   const handleClear = () => {
     setAnnotations([])
+    setSelectedId(null)
+  }
+
+  const handleDelete = () => {
+    if (selectedId) {
+      setAnnotations(annotations.filter(a => a.id !== selectedId))
+      setSelectedId(null)
+    }
   }
 
   const handleSave = () => {
     onSave?.(annotations)
   }
 
-  const renderAnnotation = (ann: Annotation) => {
+  const handleShapeClick = (id: string) => {
+    setSelectedId(id)
+    setTool("select")
+  }
+
+  const handleDragEnd = (id: string, e: KonvaEventObject<DragEvent>) => {
+    const node = e.target
+    setAnnotations(annotations.map(ann =>
+      ann.id === id
+        ? { ...ann, x: node.x(), y: node.y() }
+        : ann
+    ))
+  }
+
+  const handleTransformEnd = (id: string, e: KonvaEventObject<Event>) => {
+    const node = e.target
+    const scaleX = node.scaleX()
+    const scaleY = node.scaleY()
+
+    // Reset scale and apply to dimensions
+    node.scaleX(1)
+    node.scaleY(1)
+
+    setAnnotations(annotations.map(ann => {
+      if (ann.id !== id) return ann
+
+      if (ann.type === "rect") {
+        return {
+          ...ann,
+          x: node.x(),
+          y: node.y(),
+          width: Math.max(5, (ann.width || 0) * scaleX),
+          height: Math.max(5, (ann.height || 0) * scaleY),
+        }
+      } else if (ann.type === "circle") {
+        return {
+          ...ann,
+          x: node.x(),
+          y: node.y(),
+          radius: Math.max(5, (ann.radius || 0) * Math.max(scaleX, scaleY)),
+        }
+      }
+      return ann
+    }))
+  }
+
+  const renderAnnotation = (ann: Annotation, isPreview = false) => {
+    const isSelected = selectedId === ann.id && !isPreview
+    const commonProps = {
+      onClick: () => !isPreview && handleShapeClick(ann.id),
+      onTap: () => !isPreview && handleShapeClick(ann.id),
+      draggable: !isPreview,
+      onDragEnd: (e: KonvaEventObject<DragEvent>) => handleDragEnd(ann.id, e),
+      onTransformEnd: (e: KonvaEventObject<Event>) => handleTransformEnd(ann.id, e),
+      ref: (node: Konva.Shape | null) => {
+        if (node && !isPreview) {
+          shapeRefs.current.set(ann.id, node)
+        }
+      },
+    }
+
     if (ann.type === "rect") {
       return (
         <Rect
@@ -146,8 +249,9 @@ export function ImageAnnotator({ imageUrl, onSave, onClose }: Props) {
           width={ann.width || 0}
           height={ann.height || 0}
           stroke={ann.color}
-          strokeWidth={3}
+          strokeWidth={isSelected ? 4 : 3}
           fill={`${ann.color}20`}
+          {...commonProps}
         />
       )
     } else if (ann.type === "circle") {
@@ -158,8 +262,9 @@ export function ImageAnnotator({ imageUrl, onSave, onClose }: Props) {
           y={ann.y}
           radius={ann.radius || 0}
           stroke={ann.color}
-          strokeWidth={3}
+          strokeWidth={isSelected ? 4 : 3}
           fill={`${ann.color}20`}
+          {...commonProps}
         />
       )
     } else if (ann.type === "arrow") {
@@ -168,9 +273,25 @@ export function ImageAnnotator({ imageUrl, onSave, onClose }: Props) {
           key={ann.id}
           points={ann.points || []}
           stroke={ann.color}
-          strokeWidth={3}
+          strokeWidth={isSelected ? 4 : 3}
           lineCap="round"
           lineJoin="round"
+          draggable={!isPreview}
+          onClick={() => !isPreview && handleShapeClick(ann.id)}
+          onTap={() => !isPreview && handleShapeClick(ann.id)}
+          onDragEnd={(e: KonvaEventObject<DragEvent>) => {
+            const node = e.target
+            const dx = node.x()
+            const dy = node.y()
+            node.x(0)
+            node.y(0)
+            const points = ann.points || []
+            setAnnotations(annotations.map(a =>
+              a.id === ann.id
+                ? { ...a, points: points.map((p, i) => p + (i % 2 === 0 ? dx : dy)) }
+                : a
+            ))
+          }}
         />
       )
     }
@@ -196,7 +317,16 @@ export function ImageAnnotator({ imageUrl, onSave, onClose }: Props) {
           {/* Tools */}
           <div className="flex items-center gap-1">
             <button
-              onClick={() => setTool("rect")}
+              onClick={() => setTool("select")}
+              className={`p-2 rounded ${tool === "select" ? "bg-blue-100 text-blue-600" : "hover:bg-gray-200"}`}
+              title="Select & Move"
+            >
+              <svg viewBox="0 0 24 24" className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M3 3l7.07 16.97 2.51-7.39 7.39-2.51L3 3z" />
+              </svg>
+            </button>
+            <button
+              onClick={() => { setTool("rect"); setSelectedId(null) }}
               className={`p-2 rounded ${tool === "rect" ? "bg-blue-100 text-blue-600" : "hover:bg-gray-200"}`}
               title="Rectangle"
             >
@@ -205,7 +335,7 @@ export function ImageAnnotator({ imageUrl, onSave, onClose }: Props) {
               </svg>
             </button>
             <button
-              onClick={() => setTool("circle")}
+              onClick={() => { setTool("circle"); setSelectedId(null) }}
               className={`p-2 rounded ${tool === "circle" ? "bg-blue-100 text-blue-600" : "hover:bg-gray-200"}`}
               title="Circle"
             >
@@ -214,7 +344,7 @@ export function ImageAnnotator({ imageUrl, onSave, onClose }: Props) {
               </svg>
             </button>
             <button
-              onClick={() => setTool("arrow")}
+              onClick={() => { setTool("arrow"); setSelectedId(null) }}
               className={`p-2 rounded ${tool === "arrow" ? "bg-blue-100 text-blue-600" : "hover:bg-gray-200"}`}
               title="Line"
             >
@@ -242,6 +372,14 @@ export function ImageAnnotator({ imageUrl, onSave, onClose }: Props) {
 
           {/* Actions */}
           <button
+            onClick={handleDelete}
+            disabled={!selectedId}
+            className="px-3 py-1 text-sm text-red-600 hover:bg-red-50 rounded disabled:opacity-50"
+            title="Delete selected"
+          >
+            Delete
+          </button>
+          <button
             onClick={handleUndo}
             disabled={annotations.length === 0}
             className="px-3 py-1 text-sm text-gray-600 hover:bg-gray-200 rounded disabled:opacity-50"
@@ -262,6 +400,8 @@ export function ImageAnnotator({ imageUrl, onSave, onClose }: Props) {
           <Stage
             width={stageSize.width}
             height={stageSize.height}
+            onClick={handleStageClick}
+            onTap={handleStageClick}
             onMouseDown={handleMouseDown}
             onMouseMove={handleMouseMove}
             onMouseUp={handleMouseUp}
@@ -276,10 +416,21 @@ export function ImageAnnotator({ imageUrl, onSave, onClose }: Props) {
                   image={image}
                   width={stageSize.width}
                   height={stageSize.height}
+                  name="background"
                 />
               )}
-              {annotations.map(renderAnnotation)}
-              {currentAnnotation && renderAnnotation(currentAnnotation)}
+              {annotations.map(ann => renderAnnotation(ann, false))}
+              {currentAnnotation && renderAnnotation(currentAnnotation, true)}
+              <Transformer
+                ref={transformerRef}
+                boundBoxFunc={(oldBox, newBox) => {
+                  // Limit minimum size
+                  if (newBox.width < 10 || newBox.height < 10) {
+                    return oldBox
+                  }
+                  return newBox
+                }}
+              />
             </Layer>
           </Stage>
         </div>
