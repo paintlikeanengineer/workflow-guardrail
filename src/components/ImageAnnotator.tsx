@@ -390,7 +390,7 @@ export function ImageAnnotator({ imageUrl, onSave, onClose }: Props) {
           <div className="flex items-center gap-1">
             <button
               onClick={() => setTool("select")}
-              className={`p-2 rounded ${tool === "select" ? "bg-blue-100 text-blue-600" : "hover:bg-gray-200"}`}
+              className={`p-2 rounded ${tool === "select" ? "bg-blue-100 text-blue-600" : "text-gray-700 hover:bg-gray-200"}`}
               title="Select & Move"
             >
               <svg viewBox="0 0 24 24" className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2">
@@ -399,7 +399,7 @@ export function ImageAnnotator({ imageUrl, onSave, onClose }: Props) {
             </button>
             <button
               onClick={() => { setTool("rect"); setSelectedId(null) }}
-              className={`p-2 rounded ${tool === "rect" ? "bg-blue-100 text-blue-600" : "hover:bg-gray-200"}`}
+              className={`p-2 rounded ${tool === "rect" ? "bg-blue-100 text-blue-600" : "text-gray-700 hover:bg-gray-200"}`}
               title="Rectangle"
             >
               <svg viewBox="0 0 24 24" className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2">
@@ -408,7 +408,7 @@ export function ImageAnnotator({ imageUrl, onSave, onClose }: Props) {
             </button>
             <button
               onClick={() => { setTool("circle"); setSelectedId(null) }}
-              className={`p-2 rounded ${tool === "circle" ? "bg-blue-100 text-blue-600" : "hover:bg-gray-200"}`}
+              className={`p-2 rounded ${tool === "circle" ? "bg-blue-100 text-blue-600" : "text-gray-700 hover:bg-gray-200"}`}
               title="Circle"
             >
               <svg viewBox="0 0 24 24" className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2">
@@ -417,7 +417,7 @@ export function ImageAnnotator({ imageUrl, onSave, onClose }: Props) {
             </button>
             <button
               onClick={() => { setTool("arrow"); setSelectedId(null) }}
-              className={`p-2 rounded ${tool === "arrow" ? "bg-blue-100 text-blue-600" : "hover:bg-gray-200"}`}
+              className={`p-2 rounded ${tool === "arrow" ? "bg-blue-100 text-blue-600" : "text-gray-700 hover:bg-gray-200"}`}
               title="Line"
             >
               <svg viewBox="0 0 24 24" className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2">
@@ -426,7 +426,7 @@ export function ImageAnnotator({ imageUrl, onSave, onClose }: Props) {
             </button>
             <button
               onClick={() => { setTool("text"); setSelectedId(null) }}
-              className={`p-2 rounded ${tool === "text" ? "bg-blue-100 text-blue-600" : "hover:bg-gray-200"}`}
+              className={`p-2 rounded ${tool === "text" ? "bg-blue-100 text-blue-600" : "text-gray-700 hover:bg-gray-200"}`}
               title="Text"
             >
               <svg viewBox="0 0 24 24" className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2">
