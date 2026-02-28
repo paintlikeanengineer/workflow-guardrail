@@ -90,9 +90,9 @@ export function MessageBubble({ message, isCurrentUser, onSendAnnotatedImage, on
 
         {/* Question card if present */}
         {message.question && (
-          <div className="mt-2 p-2 bg-black/10 rounded-lg">
-            <p className="text-xs font-medium mb-1">{message.question.text}</p>
-            <div className="flex flex-wrap gap-1">
+          <div className="mt-2 p-2.5 bg-black/20 rounded-lg">
+            <p className="text-xs font-medium mb-2">{message.question.text}</p>
+            <div className="flex flex-wrap gap-2">
               {message.question.options.map((opt) => {
                 const isAnswered = !!message.question?.answer
                 const isSelected = message.question?.answer === opt
@@ -103,12 +103,12 @@ export function MessageBubble({ message, isCurrentUser, onSendAnnotatedImage, on
                     key={opt}
                     onClick={() => canClick && onAnswerQuestion(message.messageId, opt)}
                     disabled={isAnswered}
-                    className={`text-xs px-3 py-1.5 rounded transition-all ${
+                    className={`text-xs px-4 py-2 rounded-lg font-medium transition-all ${
                       isSelected
-                        ? "bg-white text-green-600 font-semibold ring-2 ring-green-500"
+                        ? "bg-white text-green-600 font-bold ring-2 ring-white shadow-lg"
                         : isAnswered
-                        ? "bg-white/30 text-gray-500 cursor-default"
-                        : "bg-white/80 hover:bg-white hover:shadow cursor-pointer"
+                        ? "bg-white/20 text-white/50 cursor-default"
+                        : "bg-white text-gray-800 hover:bg-gray-100 hover:shadow-md cursor-pointer shadow"
                     }`}
                   >
                     {opt}

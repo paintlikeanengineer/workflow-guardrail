@@ -36,6 +36,10 @@ type PRDData = {
     freeIterationsUntil: string
     hourlyRateAfter: number
     currency: string
+    autoApproveThreshold?: {
+      maxHours: number
+      maxCost: number
+    }
   }
   summary: string
   amendments?: Amendment[]
@@ -138,6 +142,9 @@ export function PRDPanel({ prd, onReset }: Props) {
           <div className="text-xs text-gray-300 space-y-1">
             <p>Free iterations until: <span className="text-green-400">{prd.terms.freeIterationsUntil}</span></p>
             <p>Rate after: <span className="text-amber-400">${prd.terms.hourlyRateAfter}/hr</span></p>
+            {prd.terms.autoApproveThreshold && (
+              <p>Auto-approve limit: <span className="text-blue-400">{prd.terms.autoApproveThreshold.maxHours}hr / ${prd.terms.autoApproveThreshold.maxCost}</span></p>
+            )}
           </div>
         </div>
 
