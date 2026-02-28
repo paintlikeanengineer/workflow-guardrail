@@ -10,9 +10,10 @@ type Props = {
   message: Message
   isCurrentUser: boolean
   onSendAnnotatedImage?: (imageUrl: string) => void
+  onAnswerQuestion?: (messageId: string, answer: string) => void
 }
 
-export function MessageBubble({ message, isCurrentUser, onSendAnnotatedImage }: Props) {
+export function MessageBubble({ message, isCurrentUser, onSendAnnotatedImage, onAnswerQuestion }: Props) {
   const [showAnnotator, setShowAnnotator] = useState(false)
   const alignment = isCurrentUser ? "justify-end" : "justify-start"
   const bubbleColor = isCurrentUser
@@ -77,18 +78,28 @@ export function MessageBubble({ message, isCurrentUser, onSendAnnotatedImage }: 
           <div className="mt-2 p-2 bg-black/10 rounded-lg">
             <p className="text-xs font-medium mb-1">{message.question.text}</p>
             <div className="flex flex-wrap gap-1">
-              {message.question.options.map((opt) => (
-                <span
-                  key={opt}
-                  className={`text-xs px-2 py-1 rounded ${
-                    message.question?.answer === opt
-                      ? "bg-white text-green-600 font-medium"
-                      : "bg-white/50"
-                  }`}
-                >
-                  {opt}
-                </span>
-              ))}
+              {message.question.options.map((opt) => {
+                const isAnswered = !!message.question?.answer
+                const isSelected = message.question?.answer === opt
+                const canClick = !isAnswered && onAnswerQuestion
+
+                return (
+                  <button
+                    key={opt}
+                    onClick={() => canClick && onAnswerQuestion(message.messageId, opt)}
+                    disabled={isAnswered}
+                    className={`text-xs px-3 py-1.5 rounded transition-all ${
+                      isSelected
+                        ? "bg-white text-green-600 font-semibold ring-2 ring-green-500"
+                        : isAnswered
+                        ? "bg-white/30 text-gray-500 cursor-default"
+                        : "bg-white/80 hover:bg-white hover:shadow cursor-pointer"
+                    }`}
+                  >
+                    {opt}
+                  </button>
+                )
+              })}
             </div>
           </div>
         )}

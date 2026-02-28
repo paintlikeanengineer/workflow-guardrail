@@ -236,6 +236,22 @@ export default function Home() {
             }
             setMessages((prev) => [...prev, newMessage])
           }}
+          onAnswerQuestion={(messageId, answer) => {
+            setMessages((prev) =>
+              prev.map((msg) =>
+                msg.messageId === messageId && msg.question
+                  ? {
+                      ...msg,
+                      question: {
+                        ...msg.question,
+                        answer,
+                        answeredAt: new Date().toISOString(),
+                      },
+                    }
+                  : msg
+              )
+            )
+          }}
           isThinking={isThinking}
         />
 

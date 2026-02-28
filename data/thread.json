@@ -60,9 +60,7 @@
       "question": {
         "questionId": "q-002",
         "text": "Do you like the anonymized person on the bench?",
-        "options": ["Yes", "No"],
-        "answer": "Yes",
-        "answeredAt": "2026-02-20T14:32:00Z"
+        "options": ["Yes", "No"]
       }
     },
     {

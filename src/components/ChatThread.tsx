@@ -19,6 +19,7 @@ type Props = {
   pendingValidation?: PendingValidation | null
   onValidationAction?: (action: "fix" | "send") => void
   onSendAnnotatedImage?: (imageUrl: string) => void
+  onAnswerQuestion?: (messageId: string, answer: string) => void
   isThinking?: boolean
 }
 
@@ -43,6 +44,7 @@ export function ChatThread({
   pendingValidation,
   onValidationAction,
   onSendAnnotatedImage,
+  onAnswerQuestion,
   isThinking = false,
 }: Props) {
   const bottomRef = useRef<HTMLDivElement>(null)
@@ -60,6 +62,7 @@ export function ChatThread({
           message={message}
           isCurrentUser={message.sender === currentView}
           onSendAnnotatedImage={onSendAnnotatedImage}
+          onAnswerQuestion={onAnswerQuestion}
         />
       ))}
 
@@ -75,6 +78,7 @@ export function ChatThread({
               message={pendingValidation.previewMessage}
               isCurrentUser={pendingValidation.previewMessage.sender === currentView}
               onSendAnnotatedImage={onSendAnnotatedImage}
+              onAnswerQuestion={onAnswerQuestion}
             />
           </div>
 
