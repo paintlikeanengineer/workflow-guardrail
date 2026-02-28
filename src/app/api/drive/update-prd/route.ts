@@ -48,11 +48,13 @@ export async function POST(request: NextRequest) {
 
     // Create amendment entry
     const timestamp = new Date().toISOString()
+    // Strip surrounding quotes from LLM-generated rationale
+    const cleanRationale = rationale.replace(/^["']|["']$/g, "").trim()
     const amendment: Amendment = {
       timestamp,
       deltaDays,
       deltaCostUsd,
-      rationale,
+      rationale: cleanRationale,
       status: "APPROVED BY CLIENT",
     }
 

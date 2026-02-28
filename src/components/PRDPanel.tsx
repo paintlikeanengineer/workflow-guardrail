@@ -43,16 +43,26 @@ type PRDData = {
 
 type Props = {
   prd: PRDData
+  onReset?: () => void
 }
 
-export function PRDPanel({ prd }: Props) {
+export function PRDPanel({ prd, onReset }: Props) {
   const progressPercent = Math.round((prd.timeline.currentDay / prd.timeline.totalDays) * 100)
 
   return (
     <div className="h-full flex flex-col bg-gray-900 text-gray-100">
       {/* Header */}
-      <div className="p-3 border-b border-gray-700">
+      <div className="p-3 border-b border-gray-700 flex items-center justify-between">
         <h2 className="text-sm font-semibold">Project Brief</h2>
+        {onReset && (
+          <button
+            onClick={onReset}
+            className="text-xs text-gray-400 hover:text-white hover:bg-gray-700 px-2 py-1 rounded transition-colors"
+            title="Reset PRD for demo"
+          >
+            Reset
+          </button>
+        )}
       </div>
 
       {/* Content */}

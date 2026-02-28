@@ -3,14 +3,21 @@
   "projectTitle": "Eye Clinics of San Jose - Advertising Poster",
   "clientName": "Eye Clinics of San Jose",
   "designerName": "Athena",
-  "goals": [],
+  "goals": [
+    {
+      "id": "goal-1772258755131",
+      "description": "Do you like the anonymized person on the bench?: Yes",
+      "source": "Client decision (q-002)",
+      "timestamp": "2026-02-28T06:05:55.131Z"
+    }
+  ],
   "brief": {
     "description": "Need a poster for our new advertising campaign starting July. We like your stylized drawings we saw on a mural in Santana Row. Campaign should stylize our newly constructed facility and appear playful and inviting. Here is the reference picture of our new facility that's open just this week! Some empty spaces on the poster will allow us to reuse it for online campaigns as well.",
     "style": "stylized, playful, inviting",
     "referenceImageUrl": "/images/reference.jpg"
   },
   "timeline": {
-    "totalDays": 34,
+    "totalDays": 30,
     "phases": [
       {
         "name": "Roughs",
@@ -37,14 +44,5 @@
       "maxCost": 100
     }
   },
-  "summary": "30-day poster project for Eye Clinics of San Jose. Stylized illustration of new facility. Roughs week 1, style pick week 2, final week 3. $50/hr after roughs approved.",
-  "amendments": [
-    {
-      "timestamp": "2026-02-28T05:47:56.238Z",
-      "deltaDays": 4,
-      "deltaCostUsd": 1600,
-      "rationale": "\"Changing the style entirely would add about 4 days and $1,600 to the timeline and budget. Should we hop on a quick call to discuss options?\"",
-      "status": "APPROVED BY CLIENT"
-    }
-  ]
+  "summary": "30-day poster project for Eye Clinics of San Jose. Stylized illustration of new facility. Roughs week 1, style pick week 2, final week 3. $50/hr after roughs approved."
 }

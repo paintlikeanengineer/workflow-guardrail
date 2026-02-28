@@ -132,9 +132,9 @@ export default function Home() {
 
       // Step 1: Call Vision API to detect objects
       addTraces([{
-        agent: "CortexVision",
+        agent: "ScopeWatcher",
         status: "started",
-        message: "Analyzing image for objects...",
+        message: "Calling Cortex Vision to analyze image...",
         timestamp: Date.now(),
       }])
 
@@ -151,23 +151,23 @@ export default function Home() {
         detectedObjects = visionData.detectedObjects || []
 
         addTraces([{
-          agent: "CortexVision",
+          agent: "ScopeWatcher",
           status: "completed",
-          message: `Detected ${detectedObjects.length} objects: ${detectedObjects.slice(0, 5).join(", ")}${detectedObjects.length > 5 ? "..." : ""}`,
+          message: `Cortex Vision detected ${detectedObjects.length} objects: ${detectedObjects.slice(0, 5).join(", ")}${detectedObjects.length > 5 ? "..." : ""}`,
           timestamp: Date.now(),
         }])
       } catch (err) {
         console.error("Vision API failed, using fallback:", err)
         detectedObjects = ["building", "awning", "sky", "trees"]
         addTraces([{
-          agent: "CortexVision",
+          agent: "ScopeWatcher",
           status: "warning",
-          message: "Vision API unavailable, using fallback detection",
+          message: "Cortex Vision unavailable, using fallback detection",
           timestamp: Date.now(),
         }])
       }
 
-      // Step 2: Call ScopeWatcher to validate against PRD goals
+      // Step 2: Validate against PRD goals
 
       const scopeRes = await fetch("/api/scope-watcher", {
         method: "POST",
@@ -483,7 +483,20 @@ export default function Home() {
           {rightPanelTab === "trace" ? (
             <TracePanel traces={traces} />
           ) : (
-            <PRDPanel prd={prd} />
+            <PRDPanel
+              prd={prd}
+              onReset={async () => {
+                try {
+                  await fetch("/api/prd/reset", { method: "POST" })
+                  await refreshPrd()
+                  setTraces([])
+                  setMessages(threadData.messages as Message[])
+                  setPendingValidation(null)
+                } catch (err) {
+                  console.error("Failed to reset PRD:", err)
+                }
+              }}
+            />
           )}
         </div>
       </div>
