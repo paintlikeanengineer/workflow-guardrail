@@ -129,10 +129,12 @@ export default function Home() {
     // If designer is uploading, check scope
     if (currentView === "designer") {
       setIsThinking(true)
+
+      // Step 1: Call Vision API to detect objects
       addTraces([{
-        agent: "ScopeWatcher",
+        agent: "CortexVision",
         status: "started",
-        message: "Calling Cortex Vision to analyze image...",
+        message: "Analyzing image for objects...",
         timestamp: Date.now(),
       }])
 
@@ -149,7 +151,7 @@ export default function Home() {
         detectedObjects = visionData.detectedObjects || []
 
         addTraces([{
-          agent: "ScopeWatcher",
+          agent: "CortexVision",
           status: "completed",
           message: `Detected ${detectedObjects.length} objects: ${detectedObjects.slice(0, 5).join(", ")}${detectedObjects.length > 5 ? "..." : ""}`,
           timestamp: Date.now(),
@@ -158,12 +160,14 @@ export default function Home() {
         console.error("Vision API failed, using fallback:", err)
         detectedObjects = ["building", "awning", "sky", "trees"]
         addTraces([{
-          agent: "ScopeWatcher",
+          agent: "CortexVision",
           status: "warning",
           message: "Vision API unavailable, using fallback detection",
           timestamp: Date.now(),
         }])
       }
+
+      // Step 2: Call ScopeWatcher to validate against PRD goals
 
       const scopeRes = await fetch("/api/scope-watcher", {
         method: "POST",

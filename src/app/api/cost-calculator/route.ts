@@ -2,6 +2,27 @@ import { NextRequest, NextResponse } from "next/server"
 import { CostCalculatorOutput, TraceEvent } from "@/types"
 import { generateExplanation, estimateCostFromHistory } from "@/lib/snowflake"
 import editHistoryData from "../../../../data/edit-history.json"
+import { readFileSync } from "fs"
+import { join } from "path"
+
+type PRDTerms = {
+  autoApproveThreshold?: {
+    maxHours: number
+    maxCost: number
+  }
+}
+
+function getAutoApproveThreshold(): { maxHours: number; maxCost: number } {
+  try {
+    const prdPath = join(process.cwd(), "data", "prd.json")
+    const prdContent = readFileSync(prdPath, "utf-8")
+    const prd = JSON.parse(prdContent)
+    const terms = prd.terms as PRDTerms
+    return terms.autoApproveThreshold || { maxHours: 2, maxCost: 100 }
+  } catch {
+    return { maxHours: 2, maxCost: 100 }
+  }
+}
 
 // POST /api/cost-calculator
 // Estimates time and cost impact of a change request using historical data
@@ -47,9 +68,13 @@ export async function POST(request: NextRequest) {
   const estimatedHours = estimate.estimatedHours
   const estimatedCost = estimate.estimatedCost
 
-  // Warn if scope is global or major, or cost exceeds $200
+  // Get thresholds from PRD
+  const threshold = getAutoApproveThreshold()
+
+  // Warn if scope is global/major, or exceeds PRD-defined thresholds
+  const exceedsThreshold = estimatedHours > threshold.maxHours || estimatedCost > threshold.maxCost
   const recommendation: CostCalculatorOutput["recommendation"] =
-    estimate.scope === "major" || estimate.scope === "global" || estimatedCost > 200
+    estimate.scope === "major" || estimate.scope === "global" || exceedsThreshold
       ? "warn"
       : "proceed"
 
@@ -102,8 +127,8 @@ export async function POST(request: NextRequest) {
     status: recommendation === "warn" ? "warning" : "completed",
     message:
       recommendation === "warn"
-        ? `Impact assessment: +${estimatedDays} day(s), +$${estimatedCost} (${estimate.confidence} confidence based on ${estimate.category})`
-        : `Minor change: ~${estimatedHours}hr, $${estimatedCost}. Within scope.`,
+        ? `Impact assessment: +${estimatedDays} day(s), +$${estimatedCost} (exceeds threshold: ${threshold.maxHours}hr/$${threshold.maxCost})`
+        : `Minor change: ~${estimatedHours}hr, $${estimatedCost}. Within auto-approve threshold (${threshold.maxHours}hr/$${threshold.maxCost}).`,
     timestamp: Date.now(),
     data: {
       hours: estimatedHours,
@@ -113,6 +138,7 @@ export async function POST(request: NextRequest) {
       scope: estimate.scope,
       confidence: estimate.confidence,
       recommendation,
+      threshold: `${threshold.maxHours}hr / $${threshold.maxCost}`,
     },
   })
 

@@ -36,16 +36,26 @@ type Props = {
   isThinking?: boolean
 }
 
-// Typing indicator bubble
+// Centered thinking indicator
 function ThinkingBubble() {
   return (
-    <div className="flex justify-start mb-2">
-      <div className="bg-white text-gray-900 border border-gray-200 rounded-2xl rounded-bl-md px-4 py-3">
-        <div className="flex items-center gap-1">
-          <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: "0ms" }} />
-          <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: "150ms" }} />
-          <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: "300ms" }} />
-        </div>
+    <div className="flex justify-center my-4">
+      <div className="flex items-center gap-2 text-gray-500 text-sm">
+        <span className="animate-pulse">Thinking</span>
+        <span className="flex gap-1">
+          <span
+            className="w-1.5 h-1.5 bg-blue-500 rounded-full animate-bounce"
+            style={{ animationDelay: "0ms", animationDuration: "0.6s" }}
+          />
+          <span
+            className="w-1.5 h-1.5 bg-blue-500 rounded-full animate-bounce"
+            style={{ animationDelay: "150ms", animationDuration: "0.6s" }}
+          />
+          <span
+            className="w-1.5 h-1.5 bg-blue-500 rounded-full animate-bounce"
+            style={{ animationDelay: "300ms", animationDuration: "0.6s" }}
+          />
+        </span>
       </div>
     </div>
   )

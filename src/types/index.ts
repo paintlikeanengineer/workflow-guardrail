@@ -148,7 +148,7 @@ export type ValidationCard = {
 // Trace Events (for debug/demo visibility)
 // ===========================================
 
-export type AgentName = 'ScopeScribe' | 'ScopeWatcher' | 'ChangeTriage' | 'CostCalculator' | 'PRD-Sync' | 'IntentLens'
+export type AgentName = 'ScopeScribe' | 'ScopeWatcher' | 'ChangeTriage' | 'CostCalculator' | 'PRD-Sync' | 'IntentLens' | 'CortexVision'
 
 export type TraceEvent = {
   agent: AgentName

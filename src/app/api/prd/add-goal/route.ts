@@ -29,11 +29,22 @@ export async function POST(request: NextRequest) {
       timestamp,
     }
 
-    // Add to goals array
+    // Add to goals array (prevent duplicates by questionId)
     if (!prd.goals) {
       prd.goals = []
     }
-    prd.goals.push(goal)
+
+    // Check if this question was already answered
+    const existingGoalIndex = prd.goals.findIndex(
+      (g: Goal) => g.source === `Client decision (${questionId})`
+    )
+
+    if (existingGoalIndex >= 0) {
+      // Update existing goal instead of adding duplicate
+      prd.goals[existingGoalIndex] = goal
+    } else {
+      prd.goals.push(goal)
+    }
 
     // Write back
     writeFileSync(prdPath, JSON.stringify(prd, null, 2))

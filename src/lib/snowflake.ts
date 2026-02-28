@@ -267,6 +267,78 @@ Return ONLY valid JSON, no markdown.`
   })
 }
 
+// Classify a change request using Cortex LLM
+export async function classifyChangeRequest(
+  message: string
+): Promise<{
+  category: string
+  complexity: "trivial" | "moderate" | "major"
+  reasoning: string
+}> {
+  await connectSnowflake()
+
+  const prompt = `You are analyzing a client message in a design project to determine if it's a change request and how significant it is.
+
+CLIENT MESSAGE:
+"${message}"
+
+Classify this message and return a JSON object:
+{
+  "category": "one of: conversational, feedback, color_change, add_element, remove_element, composition_change, angle_change, style_change, layout_change, typography, major_revision",
+  "complexity": "trivial (just chatting/minor tweak), moderate (affects one element), or major (affects whole design/multiple elements)",
+  "reasoning": "brief explanation"
+}
+
+Examples:
+- "Looks great!" → {"category": "conversational", "complexity": "trivial", "reasoning": "Positive feedback, no change requested"}
+- "Can you make the text bigger?" → {"category": "typography", "complexity": "moderate", "reasoning": "Single element change"}
+- "How about a complete style change?" → {"category": "style_change", "complexity": "major", "reasoning": "Would require redoing entire design"}
+- "I want a different angle" → {"category": "angle_change", "complexity": "major", "reasoning": "Camera angle affects entire composition"}
+
+Return ONLY valid JSON.`
+
+  const query = `
+    SELECT SNOWFLAKE.CORTEX.COMPLETE(
+      'claude-sonnet-4-5',
+      '${prompt.replace(/'/g, "''")}'
+    ) AS classification
+  `
+
+  return new Promise((resolve, reject) => {
+    connection.execute({
+      sqlText: query,
+      complete: (err, stmt, rows) => {
+        if (err) {
+          console.error("Cortex classification error:", err)
+          reject(err)
+        } else if (rows && rows.length > 0) {
+          try {
+            const result = rows[0] as { CLASSIFICATION: string }
+            let jsonStr = result.CLASSIFICATION
+
+            // Strip markdown code blocks if present
+            if (jsonStr.includes("```")) {
+              jsonStr = jsonStr.replace(/```json\n?/g, "").replace(/```\n?/g, "").trim()
+            }
+
+            const parsed = JSON.parse(jsonStr)
+            resolve({
+              category: parsed.category || "unknown",
+              complexity: parsed.complexity || "moderate",
+              reasoning: parsed.reasoning || "LLM classification",
+            })
+          } catch (parseErr) {
+            console.error("Failed to parse classification:", parseErr)
+            reject(parseErr)
+          }
+        } else {
+          reject(new Error("No response from Cortex"))
+        }
+      },
+    })
+  })
+}
+
 export async function detectObjectsInImage(imageName: string): Promise<string[]> {
   await connectSnowflake()
 
