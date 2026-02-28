@@ -538,36 +538,50 @@ export function ImageAnnotator({ imageUrl, onSave, onClose }: Props) {
 
       {/* Floating text input */}
       {editingTextId && (
-        <div
-          className="fixed z-[60] flex items-center gap-1"
-          style={{ left: textInputPos.x, top: textInputPos.y }}
-        >
-          <input
-            type="text"
-            autoFocus
-            value={textInputValue}
-            onChange={(e) => setTextInputValue(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") handleTextSubmit()
-              if (e.key === "Escape") handleTextCancel()
-            }}
-            placeholder="Type text..."
-            className="px-2 py-1 text-sm border border-gray-300 rounded shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-            style={{ minWidth: 150 }}
-          />
-          <button
-            onClick={handleTextSubmit}
-            className="px-2 py-1 text-sm bg-blue-600 text-white rounded hover:bg-blue-700"
-          >
-            Add
-          </button>
-          <button
+        <>
+          {/* Backdrop to catch clicks outside */}
+          <div
+            className="fixed inset-0 z-[55]"
             onClick={handleTextCancel}
-            className="px-2 py-1 text-sm text-gray-600 hover:bg-gray-200 rounded"
+          />
+          <div
+            className="fixed z-[60] bg-white rounded-lg shadow-xl border border-gray-200 p-2"
+            style={{ left: textInputPos.x, top: textInputPos.y }}
           >
-            &times;
-          </button>
-        </div>
+            {/* Header with close button */}
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-xs font-medium text-gray-500">Add Text</span>
+              <button
+                onClick={handleTextCancel}
+                className="text-gray-400 hover:text-gray-600 text-lg leading-none px-1"
+              >
+                &times;
+              </button>
+            </div>
+            {/* Input and Add button */}
+            <div className="flex items-center gap-1">
+              <input
+                type="text"
+                autoFocus
+                value={textInputValue}
+                onChange={(e) => setTextInputValue(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") handleTextSubmit()
+                  if (e.key === "Escape") handleTextCancel()
+                }}
+                placeholder="Type text..."
+                className="px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                style={{ minWidth: 150 }}
+              />
+              <button
+                onClick={handleTextSubmit}
+                className="px-3 py-1 text-sm bg-blue-600 text-white rounded hover:bg-blue-700"
+              >
+                Add
+              </button>
+            </div>
+          </div>
+        </>
       )}
     </div>
   )
