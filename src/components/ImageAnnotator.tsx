@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from "react"
 import { Stage, Layer, Rect, Circle, Line, Image as KonvaImage } from "react-konva"
+import { KonvaEventObject } from "konva/lib/Node"
 
 type Annotation = {
   id: string
@@ -54,10 +55,11 @@ export function ImageAnnotator({ imageUrl, onSave, onClose }: Props) {
     }
   }, [imageUrl])
 
-  const handleMouseDown = (e: { target: { getStage: () => { getPointerPosition: () => { x: number; y: number } | null } } }) => {
+  const handleMouseDown = (e: KonvaEventObject<MouseEvent | TouchEvent>) => {
     if (tool === "select") return
 
     const stage = e.target.getStage()
+    if (!stage) return
     const pos = stage.getPointerPosition()
     if (!pos) return
 
@@ -82,10 +84,11 @@ export function ImageAnnotator({ imageUrl, onSave, onClose }: Props) {
     setCurrentAnnotation(newAnnotation)
   }
 
-  const handleMouseMove = (e: { target: { getStage: () => { getPointerPosition: () => { x: number; y: number } | null } } }) => {
+  const handleMouseMove = (e: KonvaEventObject<MouseEvent | TouchEvent>) => {
     if (!isDrawing || !currentAnnotation) return
 
     const stage = e.target.getStage()
+    if (!stage) return
     const pos = stage.getPointerPosition()
     if (!pos) return
 

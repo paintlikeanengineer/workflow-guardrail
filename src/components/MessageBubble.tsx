@@ -1,8 +1,10 @@
 "use client"
 
+import { useState } from "react"
 import { Message } from "@/types"
 import Markdown from "react-markdown"
 import remarkGfm from "remark-gfm"
+import { ImageAnnotator } from "./ImageAnnotator"
 
 type Props = {
   message: Message
@@ -10,6 +12,8 @@ type Props = {
 }
 
 export function MessageBubble({ message, isCurrentUser }: Props) {
+  const [showAnnotator, setShowAnnotator] = useState(false)
+  const [annotatedImageUrl, setAnnotatedImageUrl] = useState<string | null>(null)
   const alignment = isCurrentUser ? "justify-end" : "justify-start"
   const bubbleColor = isCurrentUser
     ? "bg-green-500 text-white"
@@ -21,15 +25,42 @@ export function MessageBubble({ message, isCurrentUser }: Props) {
   return (
     <div className={`flex ${alignment} mb-2`}>
       <div className={`max-w-[70%] px-4 py-2 ${bubbleColor} ${bubbleRounding}`}>
-        {/* Image attachment */}
+        {/* Image attachment with annotation support */}
         {message.type === "image" && message.attachments?.[0] && (
-          <div className="mb-2">
+          <div className="mb-2 relative group">
             <img
-              src={message.attachments[0]}
+              src={annotatedImageUrl || message.attachments[0]}
               alt="Attachment"
-              className="rounded-lg max-w-full"
+              className="rounded-lg max-w-full cursor-pointer"
+              onClick={() => setShowAnnotator(true)}
             />
+            {/* Edit overlay on hover */}
+            <div
+              className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg flex items-center justify-center cursor-pointer"
+              onClick={() => setShowAnnotator(true)}
+            >
+              <div className="text-white text-center">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-8 h-8 mx-auto mb-1">
+                  <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" strokeLinecap="round" strokeLinejoin="round"/>
+                  <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+                <span className="text-xs font-medium">Annotate</span>
+              </div>
+            </div>
           </div>
+        )}
+
+        {/* Konva Annotator Modal */}
+        {showAnnotator && message.attachments?.[0] && (
+          <ImageAnnotator
+            imageUrl={message.attachments[0]}
+            onClose={() => setShowAnnotator(false)}
+            onSave={(annotations) => {
+              console.log("Saved annotations:", annotations)
+              // For now just close - could export annotated image
+              setShowAnnotator(false)
+            }}
+          />
         )}
 
         {/* Text content with markdown rendering */}
