@@ -13,12 +13,25 @@ type PendingValidation = {
   previewMessage: Message
 }
 
+type AnnotationData = {
+  id: string
+  type: "rect" | "circle" | "arrow" | "text"
+  x: number
+  y: number
+  width?: number
+  height?: number
+  radius?: number
+  points?: number[]
+  text?: string
+  color: string
+}
+
 type Props = {
   messages: Message[]
   currentView: "designer" | "client"
   pendingValidation?: PendingValidation | null
   onValidationAction?: (action: "fix" | "send") => void
-  onSendAnnotatedImage?: (imageUrl: string) => void
+  onSendAnnotatedImage?: (imageUrl: string, annotations: AnnotationData[], canvasWidth: number, canvasHeight: number, sourceImageName?: string) => void
   onAnswerQuestion?: (messageId: string, answer: string) => void
   isThinking?: boolean
 }

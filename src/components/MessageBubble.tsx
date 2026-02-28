@@ -6,10 +6,23 @@ import Markdown from "react-markdown"
 import remarkGfm from "remark-gfm"
 import { ImageAnnotator } from "./ImageAnnotator"
 
+type AnnotationData = {
+  id: string
+  type: "rect" | "circle" | "arrow" | "text"
+  x: number
+  y: number
+  width?: number
+  height?: number
+  radius?: number
+  points?: number[]
+  text?: string
+  color: string
+}
+
 type Props = {
   message: Message
   isCurrentUser: boolean
-  onSendAnnotatedImage?: (imageUrl: string) => void
+  onSendAnnotatedImage?: (imageUrl: string, annotations: AnnotationData[], canvasWidth: number, canvasHeight: number, sourceImageName?: string) => void
   onAnswerQuestion?: (messageId: string, answer: string) => void
 }
 
@@ -56,11 +69,13 @@ export function MessageBubble({ message, isCurrentUser, onSendAnnotatedImage, on
           <ImageAnnotator
             imageUrl={message.attachments[0]}
             onClose={() => setShowAnnotator(false)}
-            onSave={(imageBlob, annotations) => {
+            onSave={(imageBlob, annotations, canvasWidth, canvasHeight) => {
               console.log("Saved annotations:", annotations)
               // Create blob URL and send as new message
               const annotatedUrl = URL.createObjectURL(imageBlob)
-              onSendAnnotatedImage?.(annotatedUrl)
+              // Extract image name from attachment URL
+              const sourceImageName = message.attachments?.[0]?.split("/").pop() || "unknown"
+              onSendAnnotatedImage?.(annotatedUrl, annotations, canvasWidth, canvasHeight, sourceImageName)
               setShowAnnotator(false)
             }}
           />

@@ -24,7 +24,7 @@ type Tool = "select" | "rect" | "circle" | "arrow" | "text"
 
 type Props = {
   imageUrl: string
-  onSave?: (imageBlob: Blob, annotations: Annotation[]) => void
+  onSave?: (imageBlob: Blob, annotations: Annotation[], canvasWidth: number, canvasHeight: number) => void
   onClose?: () => void
 }
 
@@ -209,7 +209,7 @@ export function ImageAnnotator({ imageUrl, onSave, onClose }: Props) {
     const response = await fetch(dataUrl)
     const blob = await response.blob()
 
-    onSave?.(blob, annotations)
+    onSave?.(blob, annotations, stageSize.width, stageSize.height)
   }
 
   const handleTextSubmit = () => {

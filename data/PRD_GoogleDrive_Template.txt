@@ -1,0 +1,61 @@
+================================================================================
+PROJECT REQUIREMENTS DOCUMENT (PRD)
+================================================================================
+Project: Eye Clinics of San Jose - Advertising Poster
+Client: Marcus Chen, Marketing Director
+Designer: Athena Studios
+PRD ID: prd-eye-clinics-001
+
+================================================================================
+TIMELINE
+================================================================================
+Project Start: February 15, 2026
+Baseline Duration: 10 days
+Current Deadline: February 25, 2026
+Buffer Days: 0
+
+================================================================================
+BUDGET
+================================================================================
+Base Project Fee: $1,500
+Free Iterations After Signoff: 2
+Extra Iteration Rate: $50/hour
+Current Total: $1,500
+
+================================================================================
+APPROVED ELEMENTS (DO NOT REMOVE WITHOUT CLIENT APPROVAL)
+================================================================================
+[x] Composition C - Three-quarter angle view of building
+[x] Anonymized person sitting on bench - Approved Feb 20, 2026
+[ ] Final color palette - Pending
+
+================================================================================
+CONSTRAINTS
+================================================================================
+Must Include:
+- Eye Clinics of San Jose building (exterior)
+- Company logo
+- Approved awning design
+- Person on bench (per client approval)
+
+Color Palette:
+- Allowed accents: Teal, Navy, Sky Blue
+- Forbidden accents: Red, Orange, Neon colors
+
+Style:
+- Modern illustration style
+- Clean lines
+- Professional medical aesthetic
+
+================================================================================
+CHANGE LOG
+================================================================================
+[2026-02-15] Project initiated
+[2026-02-19] Roughs A, B1, B2, C presented to client
+[2026-02-20] Client selected Composition C
+[2026-02-20] Client approved bench person element
+
+---
+[END OF ORIGINAL PRD - AMENDMENTS BELOW]
+---
+

@@ -274,7 +274,51 @@ export default function Home() {
           currentView={currentView}
           pendingValidation={pendingValidation}
           onValidationAction={handleValidationAction}
-          onSendAnnotatedImage={(imageUrl) => {
+          onSendAnnotatedImage={async (imageUrl, annotations, canvasWidth, canvasHeight, sourceImageName) => {
+            // If client is annotating, run IntentLens
+            if (currentView === "client" && annotations.length > 0) {
+              addTraces([{
+                agent: "IntentLens",
+                status: "started",
+                message: "Analyzing client annotations...",
+                timestamp: Date.now(),
+              }])
+
+              try {
+                const res = await fetch("/api/intent-lens", {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({
+                    annotations: annotations.map(a => ({
+                      type: a.type === "arrow" ? "line" : a.type,
+                      x: a.x,
+                      y: a.y,
+                      width: a.width,
+                      height: a.height,
+                      radius: a.radius,
+                      points: a.points,
+                      text: a.text,
+                    })),
+                    imageName: sourceImageName || "v2_with_bench.jpg",
+                    canvasWidth,
+                    canvasHeight,
+                  }),
+                })
+                const data = await res.json()
+                if (data.traces) {
+                  addTraces(data.traces)
+                }
+              } catch (err) {
+                console.error("IntentLens error:", err)
+                addTraces([{
+                  agent: "IntentLens",
+                  status: "error",
+                  message: "Failed to analyze annotations",
+                  timestamp: Date.now(),
+                }])
+              }
+            }
+
             const newMessage: Message = {
               messageId: `msg-${Date.now()}`,
               sender: currentView,
