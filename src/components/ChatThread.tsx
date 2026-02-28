@@ -18,6 +18,22 @@ type Props = {
   currentView: "designer" | "client"
   pendingValidation?: PendingValidation | null
   onValidationAction?: (action: "fix" | "send") => void
+  isThinking?: boolean
+}
+
+// Typing indicator bubble
+function ThinkingBubble() {
+  return (
+    <div className="flex justify-start mb-2">
+      <div className="bg-white text-gray-900 border border-gray-200 rounded-2xl rounded-bl-md px-4 py-3">
+        <div className="flex items-center gap-1">
+          <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: "0ms" }} />
+          <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: "150ms" }} />
+          <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: "300ms" }} />
+        </div>
+      </div>
+    </div>
+  )
 }
 
 export function ChatThread({
@@ -25,13 +41,14 @@ export function ChatThread({
   currentView,
   pendingValidation,
   onValidationAction,
+  isThinking = false,
 }: Props) {
   const bottomRef = useRef<HTMLDivElement>(null)
 
-  // Auto-scroll to bottom when messages or pending validation changes
+  // Auto-scroll to bottom when messages, pending validation, or thinking state changes
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" })
-  }, [messages, pendingValidation])
+  }, [messages, pendingValidation, isThinking])
 
   return (
     <div className="flex-1 overflow-y-auto p-4 space-y-1 bg-gray-50">
@@ -42,6 +59,9 @@ export function ChatThread({
           isCurrentUser={message.sender === currentView}
         />
       ))}
+
+      {/* Thinking indicator */}
+      {isThinking && <ThinkingBubble />}
 
       {/* Pending preview message (grayed out) + Validation card */}
       {pendingValidation && (

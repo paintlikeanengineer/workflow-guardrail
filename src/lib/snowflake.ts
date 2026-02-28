@@ -139,6 +139,134 @@ Example: "This change would add about 2 days and $100 to the project. Want to ch
   })
 }
 
+// Use edit history to estimate cost for a new change request
+export type CostEstimate = {
+  category: string
+  scope: string
+  estimatedHours: number
+  estimatedCost: number
+  confidence: "high" | "medium" | "low"
+  similarEdits: Array<{ editId: string; requestText: string; actualHours: number; actualCost: number }>
+  reasoning: string
+}
+
+export async function estimateCostFromHistory(
+  requestText: string,
+  editHistory: Array<{
+    editId: string
+    clientName: string
+    requestText: string
+    category: string
+    scope: string
+    actualHours: number
+    actualCost: number
+    affectsOtherAssets: boolean
+  }>
+): Promise<CostEstimate> {
+  await connectSnowflake()
+
+  // Sample 20 diverse edits to keep prompt size manageable
+  const sampleHistory = editHistory.slice(0, 20)
+
+  const prompt = `You are a cost estimation assistant for a freelance designer. Based on historical edit data, estimate the cost and time for a new client request.
+
+HISTORICAL EDIT DATA (sample):
+${JSON.stringify(sampleHistory, null, 2)}
+
+NEW CLIENT REQUEST:
+"${requestText}"
+
+Analyze the request and find similar historical edits. Return a JSON object with:
+{
+  "category": "one of: color_change, add_element, remove_element, composition_change, angle_change, style_change, layout_change, typography",
+  "scope": "one of: single_element, global, major",
+  "estimatedHours": number,
+  "estimatedCost": number,
+  "confidence": "high if very similar edits exist, medium if somewhat similar, low if no good matches",
+  "similarEditIds": ["edit-xxx", "edit-yyy"] (up to 3 most similar),
+  "reasoning": "brief explanation of your estimate"
+}
+
+Return ONLY valid JSON, no markdown.`
+
+  const query = `
+    SELECT SNOWFLAKE.CORTEX.COMPLETE(
+      'claude-sonnet-4-5',
+      '${prompt.replace(/'/g, "''")}'
+    ) AS estimate
+  `
+
+  return new Promise((resolve) => {
+    connection.execute({
+      sqlText: query,
+      complete: (err, stmt, rows) => {
+        if (err) {
+          console.error("Cortex cost estimation error:", err)
+          // Fallback to rule-based estimate
+          resolve({
+            category: "composition_change",
+            scope: "major",
+            estimatedHours: 16,
+            estimatedCost: 800,
+            confidence: "low",
+            similarEdits: [],
+            reasoning: "Unable to analyze with LLM, using conservative estimate",
+          })
+        } else if (rows && rows.length > 0) {
+          try {
+            const result = rows[0] as { ESTIMATE: string }
+            let jsonStr = result.ESTIMATE
+
+            // Strip markdown code blocks if present
+            if (jsonStr.includes("```")) {
+              jsonStr = jsonStr.replace(/```json\n?/g, "").replace(/```\n?/g, "").trim()
+            }
+
+            const estimate = JSON.parse(jsonStr)
+
+            // Map similarEditIds to full edit objects
+            const similarEdits = (estimate.similarEditIds || [])
+              .map((id: string) => editHistory.find(e => e.editId === id))
+              .filter(Boolean)
+              .slice(0, 3)
+
+            resolve({
+              category: estimate.category || "composition_change",
+              scope: estimate.scope || "major",
+              estimatedHours: estimate.estimatedHours || 16,
+              estimatedCost: estimate.estimatedCost || 800,
+              confidence: estimate.confidence || "medium",
+              similarEdits,
+              reasoning: estimate.reasoning || "Based on historical patterns",
+            })
+          } catch (parseErr) {
+            console.error("Failed to parse cost estimate:", parseErr)
+            resolve({
+              category: "composition_change",
+              scope: "major",
+              estimatedHours: 16,
+              estimatedCost: 800,
+              confidence: "low",
+              similarEdits: [],
+              reasoning: "Failed to parse LLM response, using conservative estimate",
+            })
+          }
+        } else {
+          resolve({
+            category: "composition_change",
+            scope: "major",
+            estimatedHours: 16,
+            estimatedCost: 800,
+            confidence: "low",
+            similarEdits: [],
+            reasoning: "No response from LLM, using conservative estimate",
+          })
+        }
+      },
+    })
+  })
+}
+
 export async function detectObjectsInImage(imageName: string): Promise<string[]> {
   await connectSnowflake()
 

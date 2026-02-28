@@ -22,6 +22,7 @@ export default function Home() {
   const [pendingValidation, setPendingValidation] = useState<PendingValidation | null>(null)
   const [rightPanelTab, setRightPanelTab] = useState<"trace" | "prd">("trace")
   const [toast, setToast] = useState<{ message: string; type: "success" | "info" } | null>(null)
+  const [isThinking, setIsThinking] = useState(false)
 
   const addTraces = (newTraces: TraceEvent[]) => {
     setTraces((prev) => [...prev, ...newTraces])
@@ -38,40 +39,46 @@ export default function Home() {
 
     // If client is sending, check for non-trivial changes
     if (currentView === "client") {
-      // Call change-triage
-      const triageRes = await fetch("/api/change-triage", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message: content }),
-      })
-      const triageData = await triageRes.json()
-      addTraces(triageData.traces)
-
-      if (triageData.isNonTrivial) {
-        // Call cost-calculator
-        const costRes = await fetch("/api/cost-calculator", {
+      setIsThinking(true)
+      try {
+        // Call change-triage
+        const triageRes = await fetch("/api/change-triage", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            task: triageData.output.task,
-            complexity: triageData.output.task?.complexity || "major",
-          }),
+          body: JSON.stringify({ message: content }),
         })
-        const costData = await costRes.json()
-        addTraces(costData.traces)
+        const triageData = await triageRes.json()
+        addTraces(triageData.traces)
 
-        if (costData.output.recommendation === "warn") {
-          // Show preview + validation inline
-          setPendingValidation({
-            id: `card-${Date.now()}`,
-            type: "cost_warning",
-            title: "Impact Warning",
-            message: `This change would add ${costData.output.estimatedDays} day(s) and $${costData.output.estimatedCost} to the project. Still send?`,
-            previewMessage: newMessage,
-            data: costData.output,
+        if (triageData.isNonTrivial) {
+          // Call cost-calculator
+          const costRes = await fetch("/api/cost-calculator", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              task: triageData.output.task,
+              complexity: triageData.output.task?.complexity || "major",
+            }),
           })
-          return
+          const costData = await costRes.json()
+          addTraces(costData.traces)
+
+          if (costData.output.recommendation === "warn") {
+            setIsThinking(false)
+            // Show preview + validation inline
+            setPendingValidation({
+              id: `card-${Date.now()}`,
+              type: "cost_warning",
+              title: "Impact Warning",
+              message: `This change would add ${costData.output.estimatedDays} day(s) and $${costData.output.estimatedCost} to the project. Still send?`,
+              previewMessage: newMessage,
+              data: costData.output,
+            })
+            return
+          }
         }
+      } finally {
+        setIsThinking(false)
       }
     }
 
@@ -93,6 +100,7 @@ export default function Home() {
 
     // If designer is uploading, check scope
     if (currentView === "designer") {
+      setIsThinking(true)
       addTraces([{
         agent: "ScopeWatcher",
         status: "started",
@@ -139,6 +147,7 @@ export default function Home() {
       })
       const scopeData = await scopeRes.json()
       addTraces(scopeData.traces)
+      setIsThinking(false)
 
       if (!scopeData.output.valid) {
         // Show preview + validation inline
@@ -216,6 +225,7 @@ export default function Home() {
           currentView={currentView}
           pendingValidation={pendingValidation}
           onValidationAction={handleValidationAction}
+          isThinking={isThinking}
         />
 
         {/* Input */}

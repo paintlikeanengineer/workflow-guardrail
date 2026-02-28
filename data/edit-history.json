@@ -1,0 +1,1004 @@
+{
+  "editHistory": [
+    {
+      "editId": "edit-001",
+      "clientName": "Marcus",
+      "requestText": "Can we make the sky more blue?",
+      "category": "color_change",
+      "scope": "single_element",
+      "actualHours": 2,
+      "actualCost": 100,
+      "affectsOtherAssets": false
+    },
+    {
+      "editId": "edit-002",
+      "clientName": "Sarah",
+      "requestText": "Change the overall color palette to warmer tones",
+      "category": "color_change",
+      "scope": "global",
+      "actualHours": 16,
+      "actualCost": 800,
+      "affectsOtherAssets": true
+    },
+    {
+      "editId": "edit-003",
+      "clientName": "David",
+      "requestText": "Add a person sitting on the bench",
+      "category": "add_element",
+      "scope": "single_element",
+      "actualHours": 4,
+      "actualCost": 200,
+      "affectsOtherAssets": false
+    },
+    {
+      "editId": "edit-004",
+      "clientName": "Marcus",
+      "requestText": "Remove the trees entirely and replace with buildings",
+      "category": "composition_change",
+      "scope": "major",
+      "actualHours": 24,
+      "actualCost": 1200,
+      "affectsOtherAssets": true
+    },
+    {
+      "editId": "edit-005",
+      "clientName": "Jennifer",
+      "requestText": "Change the viewing angle from front to three-quarter view",
+      "category": "angle_change",
+      "scope": "major",
+      "actualHours": 20,
+      "actualCost": 1000,
+      "affectsOtherAssets": false
+    },
+    {
+      "editId": "edit-006",
+      "clientName": "Michael",
+      "requestText": "Switch from realistic style to flat illustration",
+      "category": "style_change",
+      "scope": "major",
+      "actualHours": 32,
+      "actualCost": 1600,
+      "affectsOtherAssets": true
+    },
+    {
+      "editId": "edit-007",
+      "clientName": "Sarah",
+      "requestText": "Add our tagline below the company name",
+      "category": "add_element",
+      "scope": "single_element",
+      "actualHours": 2,
+      "actualCost": 100,
+      "affectsOtherAssets": false
+    },
+    {
+      "editId": "edit-008",
+      "clientName": "Emily",
+      "requestText": "Remove the background pattern completely",
+      "category": "remove_element",
+      "scope": "single_element",
+      "actualHours": 3,
+      "actualCost": 150,
+      "affectsOtherAssets": false
+    },
+    {
+      "editId": "edit-009",
+      "clientName": "David",
+      "requestText": "Rearrange all elements to create a new focal point",
+      "category": "composition_change",
+      "scope": "major",
+      "actualHours": 28,
+      "actualCost": 1400,
+      "affectsOtherAssets": true
+    },
+    {
+      "editId": "edit-010",
+      "clientName": "Marcus",
+      "requestText": "Add a subtle shadow to the product image",
+      "category": "add_element",
+      "scope": "single_element",
+      "actualHours": 1,
+      "actualCost": 50,
+      "affectsOtherAssets": false
+    },
+    {
+      "editId": "edit-011",
+      "clientName": "Lisa",
+      "requestText": "Change from bird's eye view to eye-level perspective",
+      "category": "angle_change",
+      "scope": "major",
+      "actualHours": 24,
+      "actualCost": 1200,
+      "affectsOtherAssets": true
+    },
+    {
+      "editId": "edit-012",
+      "clientName": "Robert",
+      "requestText": "Convert the photorealistic render to watercolor style",
+      "category": "style_change",
+      "scope": "major",
+      "actualHours": 36,
+      "actualCost": 1800,
+      "affectsOtherAssets": true
+    },
+    {
+      "editId": "edit-013",
+      "clientName": "Jennifer",
+      "requestText": "Make the call-to-action button more prominent",
+      "category": "layout_change",
+      "scope": "single_element",
+      "actualHours": 2,
+      "actualCost": 100,
+      "affectsOtherAssets": true
+    },
+    {
+      "editId": "edit-014",
+      "clientName": "Michael",
+      "requestText": "Remove the decorative border around the edges",
+      "category": "remove_element",
+      "scope": "global",
+      "actualHours": 3,
+      "actualCost": 150,
+      "affectsOtherAssets": false
+    },
+    {
+      "editId": "edit-015",
+      "clientName": "Sarah",
+      "requestText": "Change all headings to uppercase",
+      "category": "typography",
+      "scope": "global",
+      "actualHours": 4,
+      "actualCost": 200,
+      "affectsOtherAssets": true
+    },
+    {
+      "editId": "edit-016",
+      "clientName": "Emily",
+      "requestText": "Completely restructure the visual hierarchy",
+      "category": "composition_change",
+      "scope": "major",
+      "actualHours": 22,
+      "actualCost": 1100,
+      "affectsOtherAssets": true
+    },
+    {
+      "editId": "edit-017",
+      "clientName": "David",
+      "requestText": "Brighten up the product photography",
+      "category": "color_change",
+      "scope": "single_element",
+      "actualHours": 3,
+      "actualCost": 150,
+      "affectsOtherAssets": false
+    },
+    {
+      "editId": "edit-018",
+      "clientName": "Marcus",
+      "requestText": "Switch to a low-angle dramatic perspective",
+      "category": "angle_change",
+      "scope": "major",
+      "actualHours": 18,
+      "actualCost": 900,
+      "affectsOtherAssets": false
+    },
+    {
+      "editId": "edit-019",
+      "clientName": "Lisa",
+      "requestText": "Add our social media icons to the corner",
+      "category": "add_element",
+      "scope": "single_element",
+      "actualHours": 2,
+      "actualCost": 100,
+      "affectsOtherAssets": false
+    },
+    {
+      "editId": "edit-020",
+      "clientName": "Robert",
+      "requestText": "Change from vector style to hand-drawn sketch",
+      "category": "style_change",
+      "scope": "major",
+      "actualHours": 28,
+      "actualCost": 1400,
+      "affectsOtherAssets": true
+    },
+    {
+      "editId": "edit-021",
+      "clientName": "Jennifer",
+      "requestText": "Change the accent color from blue to green",
+      "category": "color_change",
+      "scope": "global",
+      "actualHours": 6,
+      "actualCost": 300,
+      "affectsOtherAssets": true
+    },
+    {
+      "editId": "edit-022",
+      "clientName": "Michael",
+      "requestText": "Increase the spacing between all sections",
+      "category": "layout_change",
+      "scope": "global",
+      "actualHours": 5,
+      "actualCost": 250,
+      "affectsOtherAssets": true
+    },
+    {
+      "editId": "edit-023",
+      "clientName": "Sarah",
+      "requestText": "Recompose the scene to show more of the environment",
+      "category": "composition_change",
+      "scope": "major",
+      "actualHours": 26,
+      "actualCost": 1300,
+      "affectsOtherAssets": true
+    },
+    {
+      "editId": "edit-024",
+      "clientName": "Emily",
+      "requestText": "Replace the stock photo with our team photo",
+      "category": "add_element",
+      "scope": "single_element",
+      "actualHours": 4,
+      "actualCost": 200,
+      "affectsOtherAssets": false
+    },
+    {
+      "editId": "edit-025",
+      "clientName": "David",
+      "requestText": "Make the body text larger for readability",
+      "category": "typography",
+      "scope": "global",
+      "actualHours": 3,
+      "actualCost": 150,
+      "affectsOtherAssets": true
+    },
+    {
+      "editId": "edit-026",
+      "clientName": "Marcus",
+      "requestText": "Remove the promotional banner at the top",
+      "category": "remove_element",
+      "scope": "single_element",
+      "actualHours": 2,
+      "actualCost": 100,
+      "affectsOtherAssets": false
+    },
+    {
+      "editId": "edit-027",
+      "clientName": "Lisa",
+      "requestText": "Change to isometric view from the current flat view",
+      "category": "angle_change",
+      "scope": "major",
+      "actualHours": 30,
+      "actualCost": 1500,
+      "affectsOtherAssets": true
+    },
+    {
+      "editId": "edit-028",
+      "clientName": "Robert",
+      "requestText": "Transform the design to a retro 80s aesthetic",
+      "category": "style_change",
+      "scope": "major",
+      "actualHours": 40,
+      "actualCost": 2000,
+      "affectsOtherAssets": true
+    },
+    {
+      "editId": "edit-029",
+      "clientName": "Jennifer",
+      "requestText": "Darken the text for better contrast",
+      "category": "color_change",
+      "scope": "global",
+      "actualHours": 2,
+      "actualCost": 100,
+      "affectsOtherAssets": false
+    },
+    {
+      "editId": "edit-030",
+      "clientName": "Michael",
+      "requestText": "Add a testimonial quote section",
+      "category": "add_element",
+      "scope": "single_element",
+      "actualHours": 6,
+      "actualCost": 300,
+      "affectsOtherAssets": false
+    },
+    {
+      "editId": "edit-031",
+      "clientName": "Sarah",
+      "requestText": "Switch to a serif font for the headlines",
+      "category": "typography",
+      "scope": "global",
+      "actualHours": 6,
+      "actualCost": 300,
+      "affectsOtherAssets": true
+    },
+    {
+      "editId": "edit-032",
+      "clientName": "Emily",
+      "requestText": "Remove the icons next to each bullet point",
+      "category": "remove_element",
+      "scope": "global",
+      "actualHours": 4,
+      "actualCost": 200,
+      "affectsOtherAssets": false
+    },
+    {
+      "editId": "edit-033",
+      "clientName": "David",
+      "requestText": "Shift the main subject to create rule-of-thirds composition",
+      "category": "composition_change",
+      "scope": "major",
+      "actualHours": 16,
+      "actualCost": 800,
+      "affectsOtherAssets": true
+    },
+    {
+      "editId": "edit-034",
+      "clientName": "Marcus",
+      "requestText": "Add a photo of our storefront to the contact section",
+      "category": "add_element",
+      "scope": "single_element",
+      "actualHours": 3,
+      "actualCost": 150,
+      "affectsOtherAssets": false
+    },
+    {
+      "editId": "edit-035",
+      "clientName": "Lisa",
+      "requestText": "Change to a top-down overhead view",
+      "category": "angle_change",
+      "scope": "major",
+      "actualHours": 22,
+      "actualCost": 1100,
+      "affectsOtherAssets": false
+    },
+    {
+      "editId": "edit-036",
+      "clientName": "Robert",
+      "requestText": "Convert to minimalist line art style",
+      "category": "style_change",
+      "scope": "major",
+      "actualHours": 24,
+      "actualCost": 1200,
+      "affectsOtherAssets": true
+    },
+    {
+      "editId": "edit-037",
+      "clientName": "Jennifer",
+      "requestText": "Add line spacing between paragraphs",
+      "category": "typography",
+      "scope": "global",
+      "actualHours": 2,
+      "actualCost": 100,
+      "affectsOtherAssets": true
+    },
+    {
+      "editId": "edit-038",
+      "clientName": "Michael",
+      "requestText": "Put a border around the feature boxes",
+      "category": "add_element",
+      "scope": "global",
+      "actualHours": 4,
+      "actualCost": 200,
+      "affectsOtherAssets": false
+    },
+    {
+      "editId": "edit-039",
+      "clientName": "Sarah",
+      "requestText": "Move the navigation menu to the left side",
+      "category": "layout_change",
+      "scope": "global",
+      "actualHours": 8,
+      "actualCost": 400,
+      "affectsOtherAssets": true
+    },
+    {
+      "editId": "edit-040",
+      "clientName": "Emily",
+      "requestText": "Remove the background image and use solid color",
+      "category": "remove_element",
+      "scope": "global",
+      "actualHours": 5,
+      "actualCost": 250,
+      "affectsOtherAssets": true
+    },
+    {
+      "editId": "edit-041",
+      "clientName": "David",
+      "requestText": "Completely reorganize the layout flow",
+      "category": "composition_change",
+      "scope": "major",
+      "actualHours": 20,
+      "actualCost": 1000,
+      "affectsOtherAssets": true
+    },
+    {
+      "editId": "edit-042",
+      "clientName": "Marcus",
+      "requestText": "Change the button colors to match our brand orange",
+      "category": "color_change",
+      "scope": "global",
+      "actualHours": 3,
+      "actualCost": 150,
+      "affectsOtherAssets": false
+    },
+    {
+      "editId": "edit-043",
+      "clientName": "Lisa",
+      "requestText": "Switch from straight-on to a dynamic diagonal angle",
+      "category": "angle_change",
+      "scope": "major",
+      "actualHours": 26,
+      "actualCost": 1300,
+      "affectsOtherAssets": false
+    },
+    {
+      "editId": "edit-044",
+      "clientName": "Robert",
+      "requestText": "Transform to a grunge textured aesthetic",
+      "category": "style_change",
+      "scope": "major",
+      "actualHours": 32,
+      "actualCost": 1600,
+      "affectsOtherAssets": true
+    },
+    {
+      "editId": "edit-045",
+      "clientName": "Jennifer",
+      "requestText": "Use a bolder weight for the subheadings",
+      "category": "typography",
+      "scope": "global",
+      "actualHours": 3,
+      "actualCost": 150,
+      "affectsOtherAssets": true
+    },
+    {
+      "editId": "edit-046",
+      "clientName": "Michael",
+      "requestText": "Remove the email signup form from the footer",
+      "category": "remove_element",
+      "scope": "single_element",
+      "actualHours": 2,
+      "actualCost": 100,
+      "affectsOtherAssets": false
+    },
+    {
+      "editId": "edit-047",
+      "clientName": "Sarah",
+      "requestText": "Add decorative flourishes around the title",
+      "category": "add_element",
+      "scope": "single_element",
+      "actualHours": 5,
+      "actualCost": 250,
+      "affectsOtherAssets": false
+    },
+    {
+      "editId": "edit-048",
+      "clientName": "Emily",
+      "requestText": "Swap the primary and secondary colors throughout",
+      "category": "color_change",
+      "scope": "global",
+      "actualHours": 10,
+      "actualCost": 500,
+      "affectsOtherAssets": true
+    },
+    {
+      "editId": "edit-049",
+      "clientName": "David",
+      "requestText": "Reframe the composition to be more symmetrical",
+      "category": "composition_change",
+      "scope": "major",
+      "actualHours": 18,
+      "actualCost": 900,
+      "affectsOtherAssets": true
+    },
+    {
+      "editId": "edit-050",
+      "clientName": "Marcus",
+      "requestText": "Add a map showing our location",
+      "category": "add_element",
+      "scope": "single_element",
+      "actualHours": 4,
+      "actualCost": 200,
+      "affectsOtherAssets": false
+    },
+    {
+      "editId": "edit-051",
+      "clientName": "Lisa",
+      "requestText": "Rotate the viewing angle 45 degrees",
+      "category": "angle_change",
+      "scope": "major",
+      "actualHours": 20,
+      "actualCost": 1000,
+      "affectsOtherAssets": true
+    },
+    {
+      "editId": "edit-052",
+      "clientName": "Robert",
+      "requestText": "Switch to a pixel art video game style",
+      "category": "style_change",
+      "scope": "major",
+      "actualHours": 36,
+      "actualCost": 1800,
+      "affectsOtherAssets": true
+    },
+    {
+      "editId": "edit-053",
+      "clientName": "Jennifer",
+      "requestText": "Make the font size smaller throughout",
+      "category": "typography",
+      "scope": "global",
+      "actualHours": 4,
+      "actualCost": 200,
+      "affectsOtherAssets": true
+    },
+    {
+      "editId": "edit-054",
+      "clientName": "Michael",
+      "requestText": "Remove all the divider lines between sections",
+      "category": "remove_element",
+      "scope": "global",
+      "actualHours": 3,
+      "actualCost": 150,
+      "affectsOtherAssets": false
+    },
+    {
+      "editId": "edit-055",
+      "clientName": "Sarah",
+      "requestText": "Center align all the content blocks",
+      "category": "layout_change",
+      "scope": "global",
+      "actualHours": 5,
+      "actualCost": 250,
+      "affectsOtherAssets": true
+    },
+    {
+      "editId": "edit-056",
+      "clientName": "Emily",
+      "requestText": "Add a gradient effect to the header",
+      "category": "add_element",
+      "scope": "single_element",
+      "actualHours": 3,
+      "actualCost": 150,
+      "affectsOtherAssets": false
+    },
+    {
+      "editId": "edit-057",
+      "clientName": "David",
+      "requestText": "Restructure to create a Z-pattern reading flow",
+      "category": "composition_change",
+      "scope": "major",
+      "actualHours": 22,
+      "actualCost": 1100,
+      "affectsOtherAssets": true
+    },
+    {
+      "editId": "edit-058",
+      "clientName": "Marcus",
+      "requestText": "Change the link color to something more visible",
+      "category": "color_change",
+      "scope": "global",
+      "actualHours": 2,
+      "actualCost": 100,
+      "affectsOtherAssets": false
+    },
+    {
+      "editId": "edit-059",
+      "clientName": "Lisa",
+      "requestText": "Change from side view to front-facing view",
+      "category": "angle_change",
+      "scope": "major",
+      "actualHours": 24,
+      "actualCost": 1200,
+      "affectsOtherAssets": false
+    },
+    {
+      "editId": "edit-060",
+      "clientName": "Robert",
+      "requestText": "Convert to a neon cyberpunk aesthetic",
+      "category": "style_change",
+      "scope": "major",
+      "actualHours": 38,
+      "actualCost": 1900,
+      "affectsOtherAssets": true
+    },
+    {
+      "editId": "edit-061",
+      "clientName": "Jennifer",
+      "requestText": "Add a colored banner strip at the very top",
+      "category": "add_element",
+      "scope": "single_element",
+      "actualHours": 2,
+      "actualCost": 100,
+      "affectsOtherAssets": false
+    },
+    {
+      "editId": "edit-062",
+      "clientName": "Michael",
+      "requestText": "Lighten the overall color scheme",
+      "category": "color_change",
+      "scope": "global",
+      "actualHours": 8,
+      "actualCost": 400,
+      "affectsOtherAssets": true
+    },
+    {
+      "editId": "edit-063",
+      "clientName": "Sarah",
+      "requestText": "Remove the drop shadow from all cards",
+      "category": "remove_element",
+      "scope": "global",
+      "actualHours": 3,
+      "actualCost": 150,
+      "affectsOtherAssets": false
+    },
+    {
+      "editId": "edit-064",
+      "clientName": "Emily",
+      "requestText": "Widen the content area to fill more screen space",
+      "category": "layout_change",
+      "scope": "global",
+      "actualHours": 6,
+      "actualCost": 300,
+      "affectsOtherAssets": true
+    },
+    {
+      "editId": "edit-065",
+      "clientName": "David",
+      "requestText": "Recompose with the logo as the central focal point",
+      "category": "composition_change",
+      "scope": "major",
+      "actualHours": 16,
+      "actualCost": 800,
+      "affectsOtherAssets": true
+    },
+    {
+      "editId": "edit-066",
+      "clientName": "Marcus",
+      "requestText": "Change the heading font to match our logo",
+      "category": "typography",
+      "scope": "global",
+      "actualHours": 5,
+      "actualCost": 250,
+      "affectsOtherAssets": true
+    },
+    {
+      "editId": "edit-067",
+      "clientName": "Lisa",
+      "requestText": "Shift to a worm's eye view looking up",
+      "category": "angle_change",
+      "scope": "major",
+      "actualHours": 28,
+      "actualCost": 1400,
+      "affectsOtherAssets": false
+    },
+    {
+      "editId": "edit-068",
+      "clientName": "Robert",
+      "requestText": "Transform to Art Deco geometric style",
+      "category": "style_change",
+      "scope": "major",
+      "actualHours": 34,
+      "actualCost": 1700,
+      "affectsOtherAssets": true
+    },
+    {
+      "editId": "edit-069",
+      "clientName": "Jennifer",
+      "requestText": "Remove the animated hover effects",
+      "category": "remove_element",
+      "scope": "global",
+      "actualHours": 4,
+      "actualCost": 200,
+      "affectsOtherAssets": false
+    },
+    {
+      "editId": "edit-070",
+      "clientName": "Michael",
+      "requestText": "Stack the columns vertically on tablet view",
+      "category": "layout_change",
+      "scope": "global",
+      "actualHours": 7,
+      "actualCost": 350,
+      "affectsOtherAssets": true
+    },
+    {
+      "editId": "edit-071",
+      "clientName": "Sarah",
+      "requestText": "Add a video thumbnail in the hero section",
+      "category": "add_element",
+      "scope": "single_element",
+      "actualHours": 5,
+      "actualCost": 250,
+      "affectsOtherAssets": false
+    },
+    {
+      "editId": "edit-072",
+      "clientName": "Emily",
+      "requestText": "Reduce the letter spacing in headings",
+      "category": "typography",
+      "scope": "global",
+      "actualHours": 2,
+      "actualCost": 100,
+      "affectsOtherAssets": true
+    },
+    {
+      "editId": "edit-073",
+      "clientName": "David",
+      "requestText": "Add more saturation to the product images",
+      "category": "color_change",
+      "scope": "global",
+      "actualHours": 4,
+      "actualCost": 200,
+      "affectsOtherAssets": false
+    },
+    {
+      "editId": "edit-074",
+      "clientName": "Marcus",
+      "requestText": "Restructure the entire visual narrative flow",
+      "category": "composition_change",
+      "scope": "major",
+      "actualHours": 30,
+      "actualCost": 1500,
+      "affectsOtherAssets": true
+    },
+    {
+      "editId": "edit-075",
+      "clientName": "Lisa",
+      "requestText": "Remove the footer logo duplication",
+      "category": "remove_element",
+      "scope": "single_element",
+      "actualHours": 1,
+      "actualCost": 50,
+      "affectsOtherAssets": false
+    },
+    {
+      "editId": "edit-076",
+      "clientName": "Robert",
+      "requestText": "Change to a tilted Dutch angle perspective",
+      "category": "angle_change",
+      "scope": "major",
+      "actualHours": 22,
+      "actualCost": 1100,
+      "affectsOtherAssets": false
+    },
+    {
+      "editId": "edit-077",
+      "clientName": "Jennifer",
+      "requestText": "Switch to a Japanese woodblock print style",
+      "category": "style_change",
+      "scope": "major",
+      "actualHours": 40,
+      "actualCost": 2000,
+      "affectsOtherAssets": true
+    },
+    {
+      "editId": "edit-078",
+      "clientName": "Michael",
+      "requestText": "Use a handwritten style font for accents",
+      "category": "typography",
+      "scope": "single_element",
+      "actualHours": 4,
+      "actualCost": 200,
+      "affectsOtherAssets": true
+    },
+    {
+      "editId": "edit-079",
+      "clientName": "Sarah",
+      "requestText": "Make the background pure white instead of off-white",
+      "category": "color_change",
+      "scope": "global",
+      "actualHours": 2,
+      "actualCost": 100,
+      "affectsOtherAssets": false
+    },
+    {
+      "editId": "edit-080",
+      "clientName": "Emily",
+      "requestText": "Add client company logos to the footer",
+      "category": "add_element",
+      "scope": "single_element",
+      "actualHours": 3,
+      "actualCost": 150,
+      "affectsOtherAssets": false
+    },
+    {
+      "editId": "edit-081",
+      "clientName": "David",
+      "requestText": "Remove all iconography and use text only",
+      "category": "remove_element",
+      "scope": "global",
+      "actualHours": 8,
+      "actualCost": 400,
+      "affectsOtherAssets": true
+    },
+    {
+      "editId": "edit-082",
+      "clientName": "Marcus",
+      "requestText": "Recompose to emphasize negative space",
+      "category": "composition_change",
+      "scope": "major",
+      "actualHours": 18,
+      "actualCost": 900,
+      "affectsOtherAssets": true
+    },
+    {
+      "editId": "edit-083",
+      "clientName": "Lisa",
+      "requestText": "Make the buttons rounded instead of square",
+      "category": "layout_change",
+      "scope": "global",
+      "actualHours": 3,
+      "actualCost": 150,
+      "affectsOtherAssets": true
+    },
+    {
+      "editId": "edit-084",
+      "clientName": "Robert",
+      "requestText": "Switch to a panoramic wide-angle view",
+      "category": "angle_change",
+      "scope": "major",
+      "actualHours": 26,
+      "actualCost": 1300,
+      "affectsOtherAssets": true
+    },
+    {
+      "editId": "edit-085",
+      "clientName": "Jennifer",
+      "requestText": "Convert to paper cutout collage style",
+      "category": "style_change",
+      "scope": "major",
+      "actualHours": 30,
+      "actualCost": 1500,
+      "affectsOtherAssets": true
+    },
+    {
+      "editId": "edit-086",
+      "clientName": "Michael",
+      "requestText": "Add a sticky header that follows scroll",
+      "category": "add_element",
+      "scope": "single_element",
+      "actualHours": 6,
+      "actualCost": 300,
+      "affectsOtherAssets": false
+    },
+    {
+      "editId": "edit-087",
+      "clientName": "Sarah",
+      "requestText": "Remove the breadcrumb navigation",
+      "category": "remove_element",
+      "scope": "single_element",
+      "actualHours": 2,
+      "actualCost": 100,
+      "affectsOtherAssets": false
+    },
+    {
+      "editId": "edit-088",
+      "clientName": "Emily",
+      "requestText": "Completely rearrange the grid structure",
+      "category": "composition_change",
+      "scope": "major",
+      "actualHours": 24,
+      "actualCost": 1200,
+      "affectsOtherAssets": true
+    },
+    {
+      "editId": "edit-089",
+      "clientName": "David",
+      "requestText": "Add more contrast between sections",
+      "category": "color_change",
+      "scope": "global",
+      "actualHours": 5,
+      "actualCost": 250,
+      "affectsOtherAssets": false
+    },
+    {
+      "editId": "edit-090",
+      "clientName": "Marcus",
+      "requestText": "Increase the body text line height",
+      "category": "typography",
+      "scope": "global",
+      "actualHours": 2,
+      "actualCost": 100,
+      "affectsOtherAssets": true
+    },
+    {
+      "editId": "edit-091",
+      "clientName": "Lisa",
+      "requestText": "Change to a close-up macro perspective",
+      "category": "angle_change",
+      "scope": "major",
+      "actualHours": 20,
+      "actualCost": 1000,
+      "affectsOtherAssets": false
+    },
+    {
+      "editId": "edit-092",
+      "clientName": "Robert",
+      "requestText": "Transform to a pop art comic book style",
+      "category": "style_change",
+      "scope": "major",
+      "actualHours": 32,
+      "actualCost": 1600,
+      "affectsOtherAssets": true
+    },
+    {
+      "editId": "edit-093",
+      "clientName": "Jennifer",
+      "requestText": "Remove the search bar from the header",
+      "category": "remove_element",
+      "scope": "single_element",
+      "actualHours": 2,
+      "actualCost": 100,
+      "affectsOtherAssets": false
+    },
+    {
+      "editId": "edit-094",
+      "clientName": "Michael",
+      "requestText": "Shrink the header height by half",
+      "category": "layout_change",
+      "scope": "single_element",
+      "actualHours": 4,
+      "actualCost": 200,
+      "affectsOtherAssets": true
+    },
+    {
+      "editId": "edit-095",
+      "clientName": "Sarah",
+      "requestText": "Restructure to create a more dynamic composition",
+      "category": "composition_change",
+      "scope": "major",
+      "actualHours": 22,
+      "actualCost": 1100,
+      "affectsOtherAssets": true
+    },
+    {
+      "editId": "edit-096",
+      "clientName": "Emily",
+      "requestText": "Add a gold accent color for premium items",
+      "category": "color_change",
+      "scope": "single_element",
+      "actualHours": 3,
+      "actualCost": 150,
+      "affectsOtherAssets": false
+    },
+    {
+      "editId": "edit-097",
+      "clientName": "David",
+      "requestText": "Use all caps for navigation items",
+      "category": "typography",
+      "scope": "single_element",
+      "actualHours": 1,
+      "actualCost": 50,
+      "affectsOtherAssets": true
+    },
+    {
+      "editId": "edit-098",
+      "clientName": "Marcus",
+      "requestText": "Switch to an extreme wide establishing shot angle",
+      "category": "angle_change",
+      "scope": "major",
+      "actualHours": 28,
+      "actualCost": 1400,
+      "affectsOtherAssets": false
+    },
+    {
+      "editId": "edit-099",
+      "clientName": "Lisa",
+      "requestText": "Convert to a stained glass mosaic style",
+      "category": "style_change",
+      "scope": "major",
+      "actualHours": 36,
+      "actualCost": 1800,
+      "affectsOtherAssets": true
+    },
+    {
+      "editId": "edit-100",
+      "clientName": "Robert",
+      "requestText": "Rebuild the entire visual hierarchy from scratch",
+      "category": "composition_change",
+      "scope": "major",
+      "actualHours": 40,
+      "actualCost": 2000,
+      "affectsOtherAssets": true
+    }
+  ]
+}

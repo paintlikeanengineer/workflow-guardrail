@@ -1,12 +1,13 @@
 import { NextRequest, NextResponse } from "next/server"
 import { CostCalculatorOutput, TraceEvent } from "@/types"
-import { generateExplanation } from "@/lib/snowflake"
+import { generateExplanation, estimateCostFromHistory } from "@/lib/snowflake"
+import editHistoryData from "../../../../data/edit-history.json"
 
 // POST /api/cost-calculator
-// Estimates time and cost impact of a change request
+// Estimates time and cost impact of a change request using historical data
 export async function POST(request: NextRequest) {
   const body = await request.json()
-  const { task, complexity = "major" } = body
+  const { task } = body
 
   const traces: TraceEvent[] = []
 
@@ -16,48 +17,72 @@ export async function POST(request: NextRequest) {
   traces.push({
     agent: "CostCalculator",
     status: "started",
-    message: `Estimating cost impact for "${complexity}" complexity change...`,
+    message: `Analyzing request against ${editHistoryData.editHistory.length} historical edits...`,
     timestamp: Date.now(),
     data: {
-      complexity,
-      task: taskPreview,
-      method: "Historical baseline + complexity multiplier"
+      request: taskPreview,
+      method: "LLM-powered historical pattern matching"
     },
   })
 
-  // RULE: Fixed estimates based on complexity (per hackathon plan)
-  // Non-trivial changes = 2 days, $100
-  let estimatedDays = 0
-  let estimatedHours = 0
-  let estimatedCost = 0
-  let recommendation: CostCalculatorOutput["recommendation"] = "proceed"
+  // Use LLM to estimate cost from historical data
+  let estimate
+  try {
+    estimate = await estimateCostFromHistory(taskStr, editHistoryData.editHistory)
+  } catch (err) {
+    console.error("Cost estimation failed:", err)
+    // Fallback to conservative estimate
+    estimate = {
+      category: "composition_change",
+      scope: "major",
+      estimatedHours: 16,
+      estimatedCost: 800,
+      confidence: "low" as const,
+      similarEdits: [],
+      reasoning: "Estimation failed, using conservative estimate",
+    }
+  }
 
-  if (complexity === "major") {
-    estimatedDays = 2
-    estimatedHours = 16
-    estimatedCost = 100
-    recommendation = "warn"
-  } else if (complexity === "moderate") {
-    estimatedDays = 1
-    estimatedHours = 8
-    estimatedCost = 50
-    recommendation = "proceed"
-  } else {
-    estimatedDays = 0
-    estimatedHours = 1
-    estimatedCost = 0
-    recommendation = "proceed"
+  const estimatedDays = Math.ceil(estimate.estimatedHours / 8)
+  const estimatedHours = estimate.estimatedHours
+  const estimatedCost = estimate.estimatedCost
+
+  // Warn if scope is global or major, or cost exceeds $200
+  const recommendation: CostCalculatorOutput["recommendation"] =
+    estimate.scope === "major" || estimate.scope === "global" || estimatedCost > 200
+      ? "warn"
+      : "proceed"
+
+  // Add trace for similar edits found
+  if (estimate.similarEdits.length > 0) {
+    traces.push({
+      agent: "CostCalculator",
+      status: "completed",
+      message: `Found ${estimate.similarEdits.length} similar historical edit(s)`,
+      timestamp: Date.now(),
+      data: {
+        category: estimate.category,
+        scope: estimate.scope,
+        confidence: estimate.confidence,
+        similarEdits: estimate.similarEdits.map(e => ({
+          request: e.requestText,
+          hours: e.actualHours,
+          cost: `$${e.actualCost}`
+        }))
+      },
+    })
   }
 
   // Generate friendly LLM explanation for warnings
-  let reasoning = `This ${complexity} change would require approximately ${estimatedDays} additional day(s) and may incur $${estimatedCost} in additional fees based on your contract terms.`
+  let reasoning = estimate.reasoning
 
   if (recommendation === "warn") {
     try {
       reasoning = await generateExplanation("cost_warning", {
         days: estimatedDays,
         cost: estimatedCost,
-        changeRequest: taskPreview
+        changeRequest: taskPreview,
+        similarEdits: estimate.similarEdits.map(e => e.requestText).join(", ")
       })
     } catch (err) {
       console.error("Failed to generate explanation:", err)
@@ -77,15 +102,17 @@ export async function POST(request: NextRequest) {
     status: recommendation === "warn" ? "warning" : "completed",
     message:
       recommendation === "warn"
-        ? `Impact exceeds threshold: +${estimatedDays} day(s), +$${estimatedCost}. Client should be notified before proceeding.`
-        : "Change is within contracted scope. No additional charges apply.",
+        ? `Impact assessment: +${estimatedDays} day(s), +$${estimatedCost} (${estimate.confidence} confidence based on ${estimate.category})`
+        : `Minor change: ~${estimatedHours}hr, $${estimatedCost}. Within scope.`,
     timestamp: Date.now(),
     data: {
       hours: estimatedHours,
       days: estimatedDays,
       cost: `$${estimatedCost}`,
+      category: estimate.category,
+      scope: estimate.scope,
+      confidence: estimate.confidence,
       recommendation,
-      reasoning: output.reasoning
     },
   })
 
