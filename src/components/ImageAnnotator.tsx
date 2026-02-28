@@ -1,13 +1,13 @@
 "use client"
 
 import { useState, useRef, useEffect } from "react"
-import { Stage, Layer, Rect, Circle, Line, Image as KonvaImage, Transformer } from "react-konva"
+import { Stage, Layer, Rect, Circle, Line, Image as KonvaImage, Transformer, Text } from "react-konva"
 import { KonvaEventObject } from "konva/lib/Node"
 import Konva from "konva"
 
 type Annotation = {
   id: string
-  type: "rect" | "circle" | "arrow"
+  type: "rect" | "circle" | "arrow" | "text"
   x: number
   y: number
   width?: number
@@ -16,10 +16,11 @@ type Annotation = {
   scaleX?: number
   scaleY?: number
   points?: number[]
+  text?: string
   color: string
 }
 
-type Tool = "select" | "rect" | "circle" | "arrow"
+type Tool = "select" | "rect" | "circle" | "arrow" | "text"
 
 type Props = {
   imageUrl: string
@@ -38,7 +39,11 @@ export function ImageAnnotator({ imageUrl, onSave, onClose }: Props) {
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const [image, setImage] = useState<HTMLImageElement | null>(null)
   const [stageSize, setStageSize] = useState({ width: 600, height: 400 })
+  const [editingTextId, setEditingTextId] = useState<string | null>(null)
+  const [textInputValue, setTextInputValue] = useState("")
+  const [textInputPos, setTextInputPos] = useState({ x: 0, y: 0 })
   const containerRef = useRef<HTMLDivElement>(null)
+  const stageRef = useRef<Konva.Stage>(null)
   const transformerRef = useRef<Konva.Transformer>(null)
   const shapeRefs = useRef<Map<string, Konva.Shape>>(new Map())
 
@@ -76,9 +81,24 @@ export function ImageAnnotator({ imageUrl, onSave, onClose }: Props) {
   }, [selectedId])
 
   const handleStageClick = (e: KonvaEventObject<MouseEvent | TouchEvent>) => {
-    // If clicking on empty area, deselect
-    if (e.target === e.target.getStage()) {
+    // If clicking on stage or background image, deselect
+    const clickedOnEmpty = e.target === e.target.getStage() || e.target.name() === "background"
+    if (clickedOnEmpty) {
       setSelectedId(null)
+
+      // If text tool is active and clicking on empty area, start text input
+      if (tool === "text") {
+        const stage = e.target.getStage()
+        if (!stage) return
+        const pos = stage.getPointerPosition()
+        if (!pos) return
+
+        // Get stage container position for absolute positioning
+        const stageBox = stage.container().getBoundingClientRect()
+        setTextInputPos({ x: stageBox.left + pos.x, y: stageBox.top + pos.y })
+        setTextInputValue("")
+        setEditingTextId(`ann-${Date.now()}`)
+      }
     }
   }
 
@@ -177,6 +197,35 @@ export function ImageAnnotator({ imageUrl, onSave, onClose }: Props) {
 
   const handleSave = () => {
     onSave?.(annotations)
+  }
+
+  const handleTextSubmit = () => {
+    if (editingTextId && textInputValue.trim()) {
+      // Calculate position relative to stage
+      const stage = stageRef.current
+      if (stage) {
+        const stageBox = stage.container().getBoundingClientRect()
+        const x = textInputPos.x - stageBox.left
+        const y = textInputPos.y - stageBox.top
+
+        const newAnnotation: Annotation = {
+          id: editingTextId,
+          type: "text",
+          x,
+          y,
+          text: textInputValue.trim(),
+          color,
+        }
+        setAnnotations([...annotations, newAnnotation])
+      }
+    }
+    setEditingTextId(null)
+    setTextInputValue("")
+  }
+
+  const handleTextCancel = () => {
+    setEditingTextId(null)
+    setTextInputValue("")
   }
 
   const handleShapeClick = (id: string) => {
@@ -294,6 +343,29 @@ export function ImageAnnotator({ imageUrl, onSave, onClose }: Props) {
           }}
         />
       )
+    } else if (ann.type === "text") {
+      return (
+        <Text
+          key={ann.id}
+          x={ann.x}
+          y={ann.y}
+          text={ann.text || ""}
+          fontSize={18}
+          fontStyle="bold"
+          fill={ann.color}
+          stroke="#ffffff"
+          strokeWidth={0.5}
+          draggable={!isPreview}
+          onClick={() => !isPreview && handleShapeClick(ann.id)}
+          onTap={() => !isPreview && handleShapeClick(ann.id)}
+          onDragEnd={(e: KonvaEventObject<DragEvent>) => handleDragEnd(ann.id, e)}
+          ref={(node: Konva.Text | null) => {
+            if (node && !isPreview) {
+              shapeRefs.current.set(ann.id, node as unknown as Konva.Shape)
+            }
+          }}
+        />
+      )
     }
     return null
   }
@@ -352,6 +424,17 @@ export function ImageAnnotator({ imageUrl, onSave, onClose }: Props) {
                 <line x1="5" y1="19" x2="19" y2="5" />
               </svg>
             </button>
+            <button
+              onClick={() => { setTool("text"); setSelectedId(null) }}
+              className={`p-2 rounded ${tool === "text" ? "bg-blue-100 text-blue-600" : "hover:bg-gray-200"}`}
+              title="Text"
+            >
+              <svg viewBox="0 0 24 24" className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M4 7V4h16v3" />
+                <path d="M12 4v16" />
+                <path d="M8 20h8" />
+              </svg>
+            </button>
           </div>
 
           <div className="w-px h-6 bg-gray-300" />
@@ -398,6 +481,7 @@ export function ImageAnnotator({ imageUrl, onSave, onClose }: Props) {
         {/* Canvas */}
         <div ref={containerRef} className="flex-1 overflow-auto p-4 bg-gray-100 flex items-center justify-center">
           <Stage
+            ref={stageRef}
             width={stageSize.width}
             height={stageSize.height}
             onClick={handleStageClick}
@@ -408,7 +492,7 @@ export function ImageAnnotator({ imageUrl, onSave, onClose }: Props) {
             onTouchStart={handleMouseDown}
             onTouchMove={handleMouseMove}
             onTouchEnd={handleMouseUp}
-            style={{ cursor: tool === "select" ? "default" : "crosshair" }}
+            style={{ cursor: tool === "select" ? "default" : (tool === "text" ? "text" : "crosshair") }}
           >
             <Layer>
               {image && (
@@ -451,6 +535,40 @@ export function ImageAnnotator({ imageUrl, onSave, onClose }: Props) {
           </button>
         </div>
       </div>
+
+      {/* Floating text input */}
+      {editingTextId && (
+        <div
+          className="fixed z-[60] flex items-center gap-1"
+          style={{ left: textInputPos.x, top: textInputPos.y }}
+        >
+          <input
+            type="text"
+            autoFocus
+            value={textInputValue}
+            onChange={(e) => setTextInputValue(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") handleTextSubmit()
+              if (e.key === "Escape") handleTextCancel()
+            }}
+            placeholder="Type text..."
+            className="px-2 py-1 text-sm border border-gray-300 rounded shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            style={{ minWidth: 150 }}
+          />
+          <button
+            onClick={handleTextSubmit}
+            className="px-2 py-1 text-sm bg-blue-600 text-white rounded hover:bg-blue-700"
+          >
+            Add
+          </button>
+          <button
+            onClick={handleTextCancel}
+            className="px-2 py-1 text-sm text-gray-600 hover:bg-gray-200 rounded"
+          >
+            &times;
+          </button>
+        </div>
+      )}
     </div>
   )
 }
