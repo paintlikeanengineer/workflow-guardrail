@@ -9,11 +9,11 @@ import { ImageAnnotator } from "./ImageAnnotator"
 type Props = {
   message: Message
   isCurrentUser: boolean
+  onSendAnnotatedImage?: (imageUrl: string) => void
 }
 
-export function MessageBubble({ message, isCurrentUser }: Props) {
+export function MessageBubble({ message, isCurrentUser, onSendAnnotatedImage }: Props) {
   const [showAnnotator, setShowAnnotator] = useState(false)
-  const [annotatedImageUrl, setAnnotatedImageUrl] = useState<string | null>(null)
   const alignment = isCurrentUser ? "justify-end" : "justify-start"
   const bubbleColor = isCurrentUser
     ? "bg-green-500 text-white"
@@ -29,7 +29,7 @@ export function MessageBubble({ message, isCurrentUser }: Props) {
         {message.type === "image" && message.attachments?.[0] && (
           <div className="mb-2 relative group">
             <img
-              src={annotatedImageUrl || message.attachments[0]}
+              src={message.attachments[0]}
               alt="Attachment"
               className="rounded-lg max-w-full cursor-pointer"
               onClick={() => setShowAnnotator(true)}
@@ -57,9 +57,9 @@ export function MessageBubble({ message, isCurrentUser }: Props) {
             onClose={() => setShowAnnotator(false)}
             onSave={(imageBlob, annotations) => {
               console.log("Saved annotations:", annotations)
-              // Create blob URL for the annotated image
+              // Create blob URL and send as new message
               const annotatedUrl = URL.createObjectURL(imageBlob)
-              setAnnotatedImageUrl(annotatedUrl)
+              onSendAnnotatedImage?.(annotatedUrl)
               setShowAnnotator(false)
             }}
           />

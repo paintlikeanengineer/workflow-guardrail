@@ -225,6 +225,17 @@ export default function Home() {
           currentView={currentView}
           pendingValidation={pendingValidation}
           onValidationAction={handleValidationAction}
+          onSendAnnotatedImage={(imageUrl) => {
+            const newMessage: Message = {
+              messageId: `msg-${Date.now()}`,
+              sender: currentView,
+              type: "image",
+              content: "Here's the marked-up version",
+              attachments: [imageUrl],
+              timestamp: new Date().toISOString(),
+            }
+            setMessages((prev) => [...prev, newMessage])
+          }}
           isThinking={isThinking}
         />
 
