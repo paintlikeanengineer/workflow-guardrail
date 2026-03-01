@@ -78,6 +78,10 @@ The app queries `POLICY_DB.DESIGN_PROJECTS.EDIT_HISTORY` for historical edit dat
 ```
 Client Message
      │
+┌─────────────┐
+│ Orchestrator │ 
+└─────────────┘
+     │
      ▼
 ┌─────────────┐
 │ ChangeTriage │ ──► Cortex LLM (classify request)
@@ -98,6 +102,19 @@ Client Message
 │  PRD-Sync   │ ──► Update project record
 └─────────────┘
 ```
+
+## Why This Is Agentic
+
+Workflow Guardrail is **not a chatbot**.
+
+A central Orchestrator routes user actions to specialized agents that:
+- Interpret intent from natural language
+- Validate against evolving project constraints
+- Query structured historical data in Snowflake
+- Estimate real deadline and cost impact
+- Gate message propagation based on outcome
+
+Each agent operates autonomously within its role, collaborating to govern workflow decisions before they propagate.
 
 ## Team
 
